@@ -1,0 +1,26 @@
+{
+  "name": "jsonbank",
+  "version": "0.0.1",
+  "description": "Official Jsonbank Node Package.",
+  "main": "dist/index.js",
+  "repository": "go",
+  "author": "jsonbankio",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "test": "npx ts-node-dev --respawn test.ts"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "object-collection": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.3.2",
+    "@xpresser/env": "^1.0.3",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2",
+    "ts-node": "^10.1.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
+  }
+}
