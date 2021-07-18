@@ -1,5 +1,5 @@
-import env from "./env";
-import { JsonBank } from "./";
+import env from "../env";
+import { JsonBank } from "../dist";
 
 async function Main() {
     const jsb = new JsonBank({
