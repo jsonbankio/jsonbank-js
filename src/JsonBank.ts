@@ -59,7 +59,7 @@ class JsonBank {
             const { data } = await v1.post<AuthenticatedData>(
                 "authenticate",
                 {},
-                this.memory.axiosPubKeyOnlyHeader()
+                this.memory.axiosPubKeyHeader()
             );
 
             if (data.authenticated) {
@@ -125,7 +125,7 @@ class JsonBank {
         try {
             const { data } = await v1.get<T>(
                 "file/" + idOrPath,
-                this.memory.axiosPubKeyOnlyHeader(
+                this.memory.axiosPubKeyHeader(
                     query ? { params: jsb_Query(query, vars) } : undefined
                 )
             );
@@ -147,6 +147,24 @@ class JsonBank {
         vars?: JSB_QueryVars
     ): Promise<T> {
         return this.getOwnContent<T>(path, query, vars);
+    }
+
+    /**
+     * Update own Content by Id or Path
+     * @param idOrPath
+     * @param content
+     */
+    async updateOwnContent<T = any>(idOrPath: string, content: string): Promise<T> {
+        try {
+            const { data } = await v1.post<T>(
+                "file/" + idOrPath,
+                { content },
+                this.memory.axiosPrvKeyHeader()
+            );
+            return data;
+        } catch (err) {
+            throw jsb_handleHttpError(err);
+        }
     }
 }
 

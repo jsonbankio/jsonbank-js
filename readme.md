@@ -1,4 +1,4 @@
-# JsonBank Javascript SDK
+# JsonBank NodeJs SDK
 
 The official repository for [jsonbank.io](https://jsonbank.io) Javascript SDK.
 ##### STAGE: (RFC)

@@ -1,5 +1,8 @@
 .idea
 node_modules
 *.log
-.env
-dist
+tests/.env
+tests
+
+.js
+.d.ts

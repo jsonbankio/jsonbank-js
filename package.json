@@ -9,6 +9,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "watch": "npx tsc --watch",
     "test": "npx ts-node-dev --respawn tests/index.spec.ts"
   },
   "dependencies": {
