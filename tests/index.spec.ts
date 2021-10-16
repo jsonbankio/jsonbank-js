@@ -1,5 +1,5 @@
 import env from "./env";
-import { JsonBank } from "../";
+import { JsonBank } from "../index";
 
 async function Main() {
     const jsb = new JsonBank({
@@ -20,11 +20,12 @@ async function Main() {
 
     const data = await jsb.updateOwnContent(
         // "currency/index.json",
-        "OR68HAWSFXFnRL_D782upOuhZhRTkOHK",
+        "public/package.json",
         JSON.stringify({
             message: "Data has been updated!"
         })
     );
+
     console.log(data);
 }
 

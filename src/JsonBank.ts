@@ -37,8 +37,8 @@ class JsonBank {
 
         if (this.config.keys) {
             this.memory.path("axios.headers").setDefined({
-                JSB_PUB_KEY: this.config.keys.pub,
-                JSB_PRV_KEY: this.config.keys.prv
+                "jsb-pub-key": this.config.keys.pub,
+                "jsb-prv-key": this.config.keys.prv
             });
         }
     }
@@ -156,11 +156,12 @@ class JsonBank {
      */
     async updateOwnContent<T = any>(idOrPath: string, content: string): Promise<T> {
         try {
-            const { data } = await v1.post<T>(
+            const { data, headers } = await v1.post<T>(
                 "file/" + idOrPath,
                 { content },
                 this.memory.axiosPrvKeyHeader()
             );
+
             return data;
         } catch (err) {
             throw jsb_handleHttpError(err);

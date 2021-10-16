@@ -4,5 +4,5 @@ node_modules
 tests/.env
 tests
 
-.js
-.d.ts
+*.js
+*.d.ts
