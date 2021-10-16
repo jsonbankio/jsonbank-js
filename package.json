@@ -1,6 +1,6 @@
 {
   "name": "jsonbank",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Official Jsonbank Node Package.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
