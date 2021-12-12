@@ -19,4 +19,18 @@ export declare namespace JSB_Response {
         username: string;
         apiKey: { title: string; projects: string };
     };
+
+    /**
+     * Create Document endpoint response
+     * /v1/authenticate response
+     */
+    type CreateDocument = {
+        document: {
+            id: string;
+            name: string;
+            path: string;
+            createdAt: string;
+        };
+        project: string;
+    };
 }

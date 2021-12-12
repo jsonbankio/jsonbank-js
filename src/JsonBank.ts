@@ -4,6 +4,8 @@ import { jsb_handleHttpError, jsb_Query } from "./helpers";
 import JsonBankMemory from "./JsonBankMemory";
 import { JSB_Query, JSB_QueryVars, JSB_Response, JsonBankConfig } from "./types";
 import AuthenticatedData = JSB_Response.AuthenticatedData;
+import fs from "fs";
+import path from "path";
 
 // Axios instance for public requests
 const httpChannel = axios.create({
@@ -12,7 +14,7 @@ const httpChannel = axios.create({
 
 // Axios instance for auth requests
 const v1 = axios.create({
-    baseURL: constants.apiUrl + "/v1"
+    baseURL: constants.apiUrl + "/api/v1"
 });
 
 /**
@@ -156,13 +158,73 @@ class JsonBank {
      */
     async updateOwnContent<T = any>(idOrPath: string, content: string): Promise<T> {
         try {
-            const { data, headers } = await v1.post<T>(
+            const { data } = await v1.post<T>(
                 "file/" + idOrPath,
                 { content },
                 this.memory.axiosPrvKeyHeader()
             );
 
             return data;
+        } catch (err) {
+            throw jsb_handleHttpError(err);
+        }
+    }
+
+    /**
+     * Create new document
+     * @param document
+     */
+    async createDocument(document: {
+        name: string;
+        project: string;
+        folder?: string;
+        content?: string | Record<string, any>;
+    }) {
+        if (typeof document.content === "object") {
+            document.content = JSON.stringify(document.content, null, 0);
+        }
+
+        try {
+            const { data } = await v1.post<JSB_Response.CreateDocument>(
+                `project/${document.project}/document`,
+                { ...document },
+                this.memory.axiosPrvKeyHeader()
+            );
+
+            return data;
+        } catch (err) {
+            throw jsb_handleHttpError(err);
+        }
+    }
+
+    /**
+     * Upload Document from file system
+     * @param document
+     */
+    uploadDocument(document: {
+        file: string;
+        project: string;
+        name?: string;
+        folder?: string;
+    }) {
+        // check if file exists
+        if (!fs.existsSync(document.file)) {
+            throw new Error(`File does not exist: ${document.file}`);
+        }
+
+        // Set name to file name if none is defined
+        if (!document.name) {
+            document.name = path.basename(document.file);
+        }
+
+        try {
+            return this.createDocument({
+                name: document.name,
+                project: document.project,
+                // Read file.
+                content: fs.readFileSync(document.file, "utf8"),
+                folder: document.folder
+            });
         } catch (err) {
             throw jsb_handleHttpError(err);
         }
