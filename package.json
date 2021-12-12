@@ -1,6 +1,6 @@
 {
   "name": "jsonbank",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Official Jsonbank Node Package.",
   "main": "index.js",
   "types": "index.d.ts",
@@ -25,5 +25,12 @@
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.5"
   },
-"keywords": ["jsonbank", "json", "bank", "api", "node", "typescript"]
+  "keywords": [
+    "jsonbank",
+    "json",
+    "bank",
+    "api",
+    "node",
+    "typescript"
+  ]
 }
