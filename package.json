@@ -4,7 +4,7 @@
   "description": "Official Jsonbank Node Package.",
   "main": "index.js",
   "types": "index.d.ts",
-  "repository": "go",
+  "repository": "https://github.com/jsonbankio/jsonbank-js",
   "author": "jsonbankio",
   "license": "MIT",
   "private": false,
