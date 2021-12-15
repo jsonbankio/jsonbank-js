@@ -14,7 +14,7 @@ const httpChannel = axios.create({
 
 // Axios instance for auth requests
 const v1 = axios.create({
-    baseURL: constants.apiUrl + "/api/v1"
+    baseURL: constants.apiUrl + "/v1"
 });
 
 /**
