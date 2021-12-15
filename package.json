@@ -15,17 +15,17 @@
     "test": "npx ts-node-dev --respawn tests/index.spec.ts"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.24.0",
     "object-collection": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^16.3.2",
-    "@xpresser/env": "^1.0.3",
-    "nodemon": "^2.0.12",
-    "prettier": "^2.3.2",
-    "ts-node": "^10.1.0",
+    "@types/node": "^16.11.13",
+    "@xpresser/env": "^1.1.3",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.8",
-    "typescript": "^4.3.5"
+    "typescript": "^4.5.4"
   },
   "keywords": [
     "jsonbank",
