@@ -101,7 +101,7 @@ class JsonBank {
     }
 
     /**
-     * Get  a json file from Github
+     * Get  a json file from GitHub
      * @param path
      */
     async getGithubContent<T = any>(path: string): Promise<T> {
@@ -114,7 +114,7 @@ class JsonBank {
     }
 
     /**
-     * Get own Content by Id or Path
+     * Get own Content by ID or Path
      * @param idOrPath
      * @param query
      * @param vars

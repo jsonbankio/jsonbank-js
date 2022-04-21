@@ -12,18 +12,19 @@
     "prepublishOnly": "npm run build",
     "build": "node ./fix.js prod && npx tsc",
     "watch": "node ./fix.js dev && npx tsc --watch",
-    "test": "npx ts-node-dev --respawn tests/index.spec.ts"
+    "test": "nodemon japaFile.js"
   },
   "dependencies": {
     "axios": "^0.24.0",
+    "japa": "^4.0.0",
     "object-collection": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^16.11.13",
-    "@xpresser/env": "^1.1.3",
+    "@xpresser/env": "^2.0.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
-    "ts-node": "^10.4.0",
+    "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.4"
   },

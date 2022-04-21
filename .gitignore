@@ -2,7 +2,6 @@
 node_modules
 *.log
 tests/.env
-tests
 
 *.js
 !fix.js
