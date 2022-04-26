@@ -9,7 +9,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run tests && npm run build",
     "build": "node ./fix.js prod && npx tsc",
     "watch": "node ./fix.js dev && npx tsc --watch",
     "test": "nodemon japaFile.js"

@@ -152,13 +152,20 @@ class JsonBank {
     }
 
     /**
-     * Update own Content by Id or Path
+     * Update own Content by ID or Path
      * @param idOrPath
      * @param content
      */
-    async updateOwnContent<T = any>(idOrPath: string, content: string): Promise<T> {
+    async updateOwnContent(
+        idOrPath: string,
+        content: string | object
+    ): Promise<{ id: string; changed: boolean; message: string }> {
+        if (typeof content === "object") {
+            content = JSON.stringify(content);
+        }
+
         try {
-            const { data } = await v1.post<T>(
+            const { data } = await v1.post(
                 "file/" + idOrPath,
                 { content },
                 this.memory.axiosPrvKeyHeader()
@@ -178,7 +185,7 @@ class JsonBank {
         name: string;
         project: string;
         folder?: string;
-        content?: string | Record<string, any>;
+        content?: string | object;
     }) {
         if (typeof document.content === "object") {
             document.content = JSON.stringify(document.content, null, 0);
@@ -227,6 +234,19 @@ class JsonBank {
             });
         } catch (err) {
             throw jsb_handleHttpError(err);
+        }
+    }
+
+    async deleteDocument(idOrPath: string) {
+        try {
+            const { data } = await v1.delete(
+                "file/" + idOrPath,
+                this.memory.axiosPrvKeyHeader()
+            );
+
+            return data as { delete: boolean };
+        } catch (err) {
+            return { delete: false };
         }
     }
 }
