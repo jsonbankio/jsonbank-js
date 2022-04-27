@@ -2,7 +2,6 @@ import axios, { AxiosInstance } from "axios";
 import { jsb_Query } from "./helpers";
 import JsonBankMemory from "./JsonBankMemory";
 import { JSB_Query, JSB_QueryVars, JSB_Response, JsonBankConfig } from "./types";
-type AuthenticatedData = JSB_Response.AuthenticatedData;
 import fs from "fs";
 import path from "path";
 
@@ -79,7 +78,7 @@ class JsonBank {
      */
     async authenticate() {
         try {
-            const { data } = await this.#v1.post<AuthenticatedData>(
+            const { data } = await this.#v1.post<JSB_Response.AuthenticatedData>(
                 "authenticate",
                 {},
                 this.memory.axiosPubKeyHeader()
@@ -334,4 +333,4 @@ class JsonBank {
     }
 }
 
-export = JsonBank;
+export default JsonBank;
