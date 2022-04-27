@@ -22,7 +22,7 @@ export declare namespace JSB_Response {
 
     /**
      * Create Document endpoint response
-     * /v1/authenticate response
+     * createDocument(): response
      */
     type CreateDocument = {
         document: {
@@ -32,5 +32,17 @@ export declare namespace JSB_Response {
             createdAt: string;
         };
         project: string;
+    };
+
+    /**
+     * Get Content Meta endpoint response
+     * getContentMeta() response
+     */
+    type ContentMeta = {
+        id: string;
+        project: string;
+        path: string;
+        updatedAt: string;
+        createdAt: string;
     };
 }

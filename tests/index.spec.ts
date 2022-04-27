@@ -2,6 +2,11 @@ import test from "japa";
 import JsonBank from "../src/JsonBank";
 import env from "./env";
 
+const testDoc = {
+    id: "kWINhzTZkI80Ktdo4EjqS5BGEALUuaEM",
+    path: "index.json"
+};
+
 // type OwnContent = {
 //     name: string;
 //     author: string;
@@ -24,11 +29,9 @@ test.group("JsonBank: Not Authenticated", (group) => {
     });
 
     test("getContent(): Get public content by Id", async (assert) => {
-        const content = await jsb.getContent("EJcYPj4Sn2xSaeY3wvVxsMQJy54LvBq0");
+        const content = await jsb.getContent(testDoc.id);
         // test with .json extension
-        const content2 = await jsb.getContent(
-            "EJcYPj4Sn2xSaeY3wvVxsMQJy54LvBq0.json"
-        );
+        const content2 = await jsb.getContent(testDoc.id + ".json");
 
         assert.deepEqual(content, {
             name: "Js SDK Test File",
@@ -36,6 +39,16 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
 
         assert.deepEqual(content, content2);
+    });
+
+    test("getContentMeta(): Get public content meta by ID", async (assert) => {
+        const meta = await jsb.getContentMeta(testDoc.id);
+        // test with .json extension
+        const meta2 = await jsb.getContentMeta(testDoc.id + ".json");
+
+        assert.hasAllKeys(meta, ["id", "project", "path", "createdAt", "updatedAt"]);
+
+        assert.deepEqual(meta, meta2);
     });
 
     test("getContentByPath(): Get public content by path", async (assert) => {
@@ -51,6 +64,18 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
 
         assert.deepEqual(content, content2);
+    });
+
+    test("getContentMetaByPath(): Get public content meta by path", async (assert) => {
+        const meta = await jsb.getContentMetaByPath("jsonbank/js-sdk-test/index");
+        // test with .json extension
+        const meta2 = await jsb.getContentMetaByPath(
+            "jsonbank/js-sdk-test/index.json"
+        );
+
+        assert.hasAllKeys(meta, ["id", "project", "path", "createdAt", "updatedAt"]);
+
+        assert.deepEqual(meta, meta2);
     });
 
     test("getGithubContent(): Get content from github", async (assert) => {
@@ -87,11 +112,17 @@ test.group("JsonBank: Authenticated", (group) => {
     });
 
     test("getOwnContent():", async (assert) => {
-        const content = await jsb.getOwnContent("EJcYPj4Sn2xSaeY3wvVxsMQJy54LvBq0");
+        const content = await jsb.getOwnContent(testDoc.id);
+
         assert.deepEqual(content, {
             name: "Js SDK Test File",
             author: "jsonbank"
         });
+    });
+
+    test("getOwnContentMeta():", async (assert) => {
+        const meta = await jsb.getOwnContentMeta(testDoc.id);
+        assert.hasAllKeys(meta, ["id", "project", "path", "createdAt", "updatedAt"]);
     });
 
     test("getOwnContentByPath():", async (assert) => {
@@ -100,6 +131,11 @@ test.group("JsonBank: Authenticated", (group) => {
             name: "Js SDK Test File",
             author: "jsonbank"
         });
+    });
+
+    test("getOwnContentMetaByPath():", async (assert) => {
+        const meta = await jsb.getOwnContentMetaByPath("js-sdk-test/index");
+        assert.hasAllKeys(meta, ["id", "project", "path", "createdAt", "updatedAt"]);
     });
 
     test("updateContent():", async (assert) => {
@@ -124,7 +160,7 @@ test.group("JsonBank: Authenticated", (group) => {
         });
     });
 
-    test.only("createDocument():", async (assert) => {
+    test("createDocument():", async (assert) => {
         await jsb.deleteDocument("js-sdk-test/folder/new_doc");
 
         const doc = await jsb.createDocument({
@@ -141,5 +177,11 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.hasAllKeys(doc.document, ["id", "name", "path", "createdAt"]);
         // test project name
         assert.equal(doc.project, "js-sdk-test");
+    });
+
+    test("hasOwnContent()", async (assert) => {
+        assert.isTrue(await jsb.hasOwnContent(testDoc.id));
+        // fail
+        assert.isFalse(await jsb.hasOwnContent("not-existing-id"));
     });
 });

@@ -93,11 +93,34 @@ class JsonBank {
     }
 
     /**
+     * Get Public Content Meta by Id or Path
+     * @param idOrPath
+     */
+    async getContentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
+        try {
+            const { data } = await httpChannel.get("meta/f/" + idOrPath, {
+                params: { meta: true }
+            });
+            return data;
+        } catch (err) {
+            throw jsb_handleHttpError(err);
+        }
+    }
+
+    /**
      * Get Public content by path
      * @param path
      */
     async getContentByPath<T = any>(path: string): Promise<T> {
         return this.getContent<T>(path);
+    }
+
+    /**
+     * Get Public content meta by path
+     * @param path
+     */
+    async getContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
+        return this.getContentMeta(path);
     }
 
     /**
@@ -116,21 +139,38 @@ class JsonBank {
     /**
      * Get own Content by ID or Path
      * @param idOrPath
-     * @param query
-     * @param vars
+     * @param options
      */
     async getOwnContent<T = any>(
         idOrPath: string,
-        query?: JSB_Query,
-        vars?: JSB_QueryVars
+        options: {
+            query?: JSB_Query;
+            vars?: JSB_QueryVars;
+        } = {}
     ): Promise<T> {
+        const config = this.memory.axiosPubKeyHeader({
+            params: {
+                ...(options.query ? jsb_Query(options.query, options.vars) : {})
+            }
+        });
+
         try {
-            const { data } = await v1.get<T>(
-                "file/" + idOrPath,
-                this.memory.axiosPubKeyHeader(
-                    query ? { params: jsb_Query(query, vars) } : undefined
-                )
-            );
+            const { data } = await v1.get<T>("file/" + idOrPath, config);
+            return data;
+        } catch (err) {
+            throw jsb_handleHttpError(err);
+        }
+    }
+
+    /**
+     * Get own Content Meta by ID or Path
+     * @param idOrPath
+     */
+    async getOwnContentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
+        const config = this.memory.axiosPubKeyHeader();
+
+        try {
+            const { data } = await v1.get("meta/file/" + idOrPath, config);
             return data;
         } catch (err) {
             throw jsb_handleHttpError(err);
@@ -140,15 +180,37 @@ class JsonBank {
     /**
      * Get own Content by Id or Path
      * @param path
-     * @param query
-     * @param vars
+     * @param options
      */
     async getOwnContentByPath<T = any>(
         path: string,
-        query?: JSB_Query,
-        vars?: JSB_QueryVars
+        options: {
+            query?: JSB_Query;
+            vars?: JSB_QueryVars;
+        } = {}
     ): Promise<T> {
-        return this.getOwnContent<T>(path, query, vars);
+        return this.getOwnContent<T>(path, options);
+    }
+
+    /**
+     * Get own Content Meta by Id or Path
+     * @param path
+     */
+    async getOwnContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
+        return this.getOwnContentMeta(path);
+    }
+
+    /**
+     * Check if a file exists
+     * @param idOrPath
+     */
+    async hasOwnContent(idOrPath: string): Promise<boolean> {
+        try {
+            await this.getOwnContent(idOrPath);
+            return true;
+        } catch (err) {
+            return false;
+        }
     }
 
     /**
