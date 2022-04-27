@@ -8,7 +8,7 @@ class JsonBankMemory extends ObjectCollection {
     axiosPubKeyHeader(data: AxiosRequestConfig = {}) {
         return {
             headers: {
-                "jsb-pub-key": this.get("axios.headers.jsb-pub-key", null)
+                "jsb-pub-key": this.get("axios.headers.jsb-pub-key")
             },
             ...data
         };
@@ -20,8 +20,8 @@ class JsonBankMemory extends ObjectCollection {
     axiosPrvKeyHeader(data: AxiosRequestConfig = {}) {
         return {
             headers: {
-                "jsb-pub-key": this.get("axios.headers.jsb-pub-key", null),
-                "jsb-prv-key": this.get("axios.headers.jsb-prv-key", null)
+                "jsb-pub-key": this.get("axios.headers.jsb-pub-key"),
+                "jsb-prv-key": this.get("axios.headers.jsb-prv-key")
             },
             ...data
         };
