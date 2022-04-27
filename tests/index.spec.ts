@@ -96,8 +96,8 @@ test.group("JsonBank: Authenticated", (group) => {
         jsb = new JsonBank({
             host: "http://localhost:2221",
             keys: {
-                prv: env.jsbPrivateKey,
-                pub: env.jsbPublicKey
+                prv: env.JSB_PRIVATE_KEY,
+                pub: env.JSB_PUBLIC_KEY
             }
         });
 
