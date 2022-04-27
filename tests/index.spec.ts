@@ -7,12 +7,6 @@ const testDoc = {
     path: "index.json"
 };
 
-// type OwnContent = {
-//     name: string;
-//     author: string;
-//     updatedAt?: string;
-// };
-
 test.group("JsonBank: Not Authenticated", (group) => {
     let jsb: JsonBank;
 
