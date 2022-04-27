@@ -26,13 +26,11 @@ export declare namespace JSB_Response {
      * createDocument(): response
      */
     type CreateDocument = {
-        document: {
-            id: string;
-            name: string;
-            path: string;
-            createdAt: string;
-        };
+        id: string;
+        name: string;
+        path: string;
         project: string;
+        createdAt: string;
     };
 
     /**

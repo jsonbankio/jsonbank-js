@@ -139,6 +139,12 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.hasAllKeys(meta, ["id", "project", "path", "createdAt", "updatedAt"]);
     });
 
+    test("hasOwnContent()", async (assert) => {
+        assert.isTrue(await jsb.hasOwnContent(testDoc.id));
+        // fail
+        assert.isFalse(await jsb.hasOwnContent("not-existing-id"));
+    });
+
     test("updateContent():", async (assert) => {
         const newContent = {
             name: "Js SDK Test File",
@@ -175,14 +181,25 @@ test.group("JsonBank: Authenticated", (group) => {
         });
 
         assert.isObject(doc);
-        assert.hasAllKeys(doc.document, ["id", "name", "path", "createdAt"]);
+        assert.hasAllKeys(doc, ["id", "name", "path", "createdAt", "project"]);
         // test project name
         assert.equal(doc.project, "js-sdk-test");
     });
 
-    test("hasOwnContent()", async (assert) => {
-        assert.isTrue(await jsb.hasOwnContent(testDoc.id));
-        // fail
-        assert.isFalse(await jsb.hasOwnContent("not-existing-id"));
+    test("uploadDocument():", async (assert) => {
+        // delete file if exists
+        await jsb.deleteDocument("js-sdk-test/folder/upload");
+
+        // upload file
+        const doc = await jsb.uploadDocument({
+            file: __dirname + "/upload.json",
+            project: "js-sdk-test",
+            folder: "folder"
+        });
+
+        assert.isObject(doc);
+        assert.hasAllKeys(doc, ["id", "name", "path", "createdAt", "project"]);
+        // test project name
+        assert.equal(doc.project, "js-sdk-test");
     });
 });
