@@ -9,10 +9,11 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prepublishOnly": "npm run tests && npm run build",
-    "build": "node ./fix.js prod && npx tsc",
-    "watch": "node ./fix.js dev && npx tsc --watch",
-    "test": "nodemon japaFile.js"
+    "prepublishOnly": "npm run test && npm run build",
+    "build": "npx tsc",
+    "watch": "npx tsc --watch",
+    "test": "node japaFile.js",
+    "test-dev": "nodemon japaFile.js"
   },
   "dependencies": {
     "axios": "^0.24.0",

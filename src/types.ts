@@ -4,6 +4,7 @@
 export type JsonBankConfig = {
     keys?: { pub?: string; prv?: string };
     via?: "http";
+    host?: string;
 };
 
 export type JSB_Query = string | string[];

@@ -1,21 +1,10 @@
-import axios from "axios";
-import constants from "../constants";
-import { jsb_handleHttpError, jsb_Query } from "./helpers";
+import axios, { AxiosInstance } from "axios";
+import { jsb_Query } from "./helpers";
 import JsonBankMemory from "./JsonBankMemory";
 import { JSB_Query, JSB_QueryVars, JSB_Response, JsonBankConfig } from "./types";
-import AuthenticatedData = JSB_Response.AuthenticatedData;
+type AuthenticatedData = JSB_Response.AuthenticatedData;
 import fs from "fs";
 import path from "path";
-
-// Axios instance for public requests
-const httpChannel = axios.create({
-    baseURL: constants.apiUrl
-});
-
-// Axios instance for auth requests
-const v1 = axios.create({
-    baseURL: constants.apiUrl + "/v1"
-});
 
 /**
  * Json Bank class
@@ -23,8 +12,24 @@ const v1 = axios.create({
 class JsonBank {
     private config!: JsonBankConfig;
     private memory!: JsonBankMemory;
+    #api: AxiosInstance;
+    #v1: AxiosInstance;
 
     constructor(config?: JsonBankConfig) {
+        if (!config) config = {};
+
+        config.host = config.host || "https://api.jsonbank.io";
+
+        // Api instance
+        this.#api = axios.create({
+            baseURL: config.host
+        });
+
+        // Api version 1 instance
+        this.#v1 = axios.create({
+            baseURL: config.host + "/v1"
+        });
+
         // Set Config
         Object.defineProperty(this, "config", {
             value: config || {},
@@ -37,12 +42,28 @@ class JsonBank {
             enumerable: false
         });
 
+        // Set default config
         if (this.config.keys) {
             this.memory.path("axios.headers").setDefined({
                 "jsb-pub-key": this.config.keys.pub,
                 "jsb-prv-key": this.config.keys.prv
             });
         }
+    }
+
+    /**
+     * Handles Axios Http Errors
+     * @reason redundancy
+     * @param err
+     */
+    private ___handleHttpError(err: any) {
+        if (err.response) {
+            if (err.response.data && err.response.data.error) {
+                return Error(err.response.data.error);
+            }
+        }
+
+        return Error(`Could not connect to ${this.config.host}`);
     }
 
     /**
@@ -58,7 +79,7 @@ class JsonBank {
      */
     async authenticate() {
         try {
-            const { data } = await v1.post<AuthenticatedData>(
+            const { data } = await this.#v1.post<AuthenticatedData>(
                 "authenticate",
                 {},
                 this.memory.axiosPubKeyHeader()
@@ -71,7 +92,7 @@ class JsonBank {
 
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -85,10 +106,10 @@ class JsonBank {
      */
     async getContent<T = any>(idOrPath: string): Promise<T> {
         try {
-            const { data } = await httpChannel.get("f/" + idOrPath);
+            const { data } = await this.#api.get("f/" + idOrPath);
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -98,12 +119,12 @@ class JsonBank {
      */
     async getContentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
         try {
-            const { data } = await httpChannel.get("meta/f/" + idOrPath, {
+            const { data } = await this.#api.get("meta/f/" + idOrPath, {
                 params: { meta: true }
             });
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -129,10 +150,10 @@ class JsonBank {
      */
     async getGithubContent<T = any>(path: string): Promise<T> {
         try {
-            const { data } = await httpChannel.get("gh/" + path);
+            const { data } = await this.#api.get("gh/" + path);
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -155,10 +176,10 @@ class JsonBank {
         });
 
         try {
-            const { data } = await v1.get<T>("file/" + idOrPath, config);
+            const { data } = await this.#v1.get<T>("file/" + idOrPath, config);
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -170,10 +191,10 @@ class JsonBank {
         const config = this.memory.axiosPubKeyHeader();
 
         try {
-            const { data } = await v1.get("meta/file/" + idOrPath, config);
+            const { data } = await this.#v1.get("meta/file/" + idOrPath, config);
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -227,7 +248,7 @@ class JsonBank {
         }
 
         try {
-            const { data } = await v1.post(
+            const { data } = await this.#v1.post(
                 "file/" + idOrPath,
                 { content },
                 this.memory.axiosPrvKeyHeader()
@@ -235,7 +256,7 @@ class JsonBank {
 
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -254,7 +275,7 @@ class JsonBank {
         }
 
         try {
-            const { data } = await v1.post<JSB_Response.CreateDocument>(
+            const { data } = await this.#v1.post<JSB_Response.CreateDocument>(
                 `project/${document.project}/document`,
                 { ...document },
                 this.memory.axiosPrvKeyHeader()
@@ -262,7 +283,7 @@ class JsonBank {
 
             return data;
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
@@ -295,13 +316,13 @@ class JsonBank {
                 folder: document.folder
             });
         } catch (err) {
-            throw jsb_handleHttpError(err);
+            throw this.___handleHttpError(err);
         }
     }
 
     async deleteDocument(idOrPath: string) {
         try {
-            const { data } = await v1.delete(
+            const { data } = await this.#v1.delete(
                 "file/" + idOrPath,
                 this.memory.axiosPrvKeyHeader()
             );

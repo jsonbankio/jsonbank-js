@@ -17,7 +17,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
     let jsb: JsonBank;
 
     group.before(() => {
-        jsb = new JsonBank();
+        jsb = new JsonBank({ host: "http://localhost:2221" });
     });
 
     test.failing("authenticate(): Should not be able to authenticate", async () => {
@@ -94,6 +94,7 @@ test.group("JsonBank: Authenticated", (group) => {
 
     group.before(async () => {
         jsb = new JsonBank({
+            host: "http://localhost:2221",
             keys: {
                 prv: env.jsbPrivateKey,
                 pub: env.jsbPublicKey
