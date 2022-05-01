@@ -1,17 +1,21 @@
 import test from "japa";
-import JsonBank from "../src/JsonBank";
+import JsonBank, { JSB_Error } from "../src/JsonBank";
 import env from "./env";
 
 const testDoc = {
-    id: "kWINhzTZkI80Ktdo4EjqS5BGEALUuaEM",
-    path: "index.json"
+    id: "", // will be gotten from the server before the test
+    path: "jsonbank/js-sdk-test/index"
 };
 
 test.group("JsonBank: Not Authenticated", (group) => {
     let jsb: JsonBank;
 
-    group.before(() => {
-        jsb = new JsonBank({ host: "http://localhost:2221" });
+    group.before(async () => {
+        jsb = new JsonBank({ host: env.JSB_HOST });
+
+        // Find id of test document
+        const index = await jsb.getContentMetaByPath(testDoc.path);
+        testDoc.id = index.id;
     });
 
     test.failing("authenticate(): Should not be able to authenticate", async () => {
@@ -88,7 +92,7 @@ test.group("JsonBank: Authenticated", (group) => {
 
     group.before(async () => {
         jsb = new JsonBank({
-            host: "http://localhost:2221",
+            host: env.JSB_HOST,
             keys: {
                 prv: env.JSB_PRIVATE_KEY,
                 pub: env.JSB_PUBLIC_KEY
@@ -159,6 +163,25 @@ test.group("JsonBank: Authenticated", (group) => {
             name: "Js SDK Test File",
             author: "jsonbank"
         });
+    });
+
+    test("createFolder():", async (assert) => {
+        try {
+            const folder = await jsb.createFolder({
+                name: "folder",
+                project: "js-sdk-test"
+            });
+
+            assert.isObject(folder);
+            assert.hasAllKeys(folder, ["id", "name", "path", "project"]);
+
+            // check folder name matches
+            assert.equal(folder.name, "folder");
+            assert.equal(folder.project, "js-sdk-test");
+        } catch (e) {
+            // Error: Folder already exists
+            if ((e as JSB_Error).code !== "name.exists") throw e;
+        }
     });
 
     test("createDocument():", async (assert) => {

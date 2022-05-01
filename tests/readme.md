@@ -3,6 +3,7 @@
 First create a `.env` file in the test folder.
 
 ```env
+JSB_HOST="https://api.jsonbank.io"
 JSB_PUBLIC_KEY="your public key"
 JSB_PRIVATE_KEY="your private key"
 ```

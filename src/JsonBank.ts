@@ -4,6 +4,16 @@ import JsonBankMemory from "./JsonBankMemory";
 import { JSB_Query, JSB_QueryVars, JSB_Response, JsonBankConfig } from "./types";
 import fs from "fs";
 import path from "path";
+import Abolish, { createFolderRule } from "./abolish";
+
+export class JSB_Error extends Error {
+    code?: string;
+
+    constructor(message?: string) {
+        super(message);
+        this.name = "JSB_Error";
+    }
+}
 
 /**
  * Json Bank class
@@ -58,7 +68,17 @@ class JsonBank {
     private ___handleHttpError(err: any) {
         if (err.response) {
             if (err.response.data && err.response.data.error) {
-                return Error(err.response.data.error);
+                const error = err.response.data.error;
+                const e = new JSB_Error();
+
+                if (typeof error === "object") {
+                    e.code = error.code;
+                    e.message = error.message;
+                } else {
+                    e.message = error;
+                }
+
+                return e;
             }
         }
 
@@ -329,6 +349,28 @@ class JsonBank {
             return data as { delete: boolean };
         } catch (err) {
             return { delete: false };
+        }
+    }
+
+    async createFolder(folder: { name: string; project: string; folder?: string }) {
+        // Validate Folder
+        folder = Abolish.attempt(folder, { object: createFolderRule });
+
+        try {
+            const { data } = await this.#v1.post(
+                `project/${folder.project}/folder`,
+                folder,
+                this.memory.axiosPrvKeyHeader()
+            );
+
+            return data as {
+                id: string;
+                name: string;
+                path: string;
+                project: string;
+            };
+        } catch (err) {
+            throw this.___handleHttpError(err);
         }
     }
 }

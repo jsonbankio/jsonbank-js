@@ -16,6 +16,7 @@
     "test-dev": "nodemon japaFile.js"
   },
   "dependencies": {
+    "abolish": "^4.11.2",
     "axios": "^0.27.2",
     "japa": "^4.0.0",
     "object-collection": "^3.0.1"
