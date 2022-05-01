@@ -4,7 +4,6 @@ import JsonBankMemory from "./JsonBankMemory";
 import { JSB_Query, JSB_QueryVars, JSB_Response, JsonBankConfig } from "./types";
 import fs from "fs";
 import path from "path";
-import Abolish, { createFolderRule } from "./abolish";
 
 export class JSB_Error extends Error {
     code?: string;
@@ -120,7 +119,7 @@ class JsonBank {
     }
 
     /**
-     * Get Public Content by Id or Path
+     * Get Public Content by ID or Path
      * @param idOrPath
      */
     async getContent<T = any>(idOrPath: string): Promise<T> {
@@ -353,9 +352,6 @@ class JsonBank {
     }
 
     async createFolder(folder: { name: string; project: string; folder?: string }) {
-        // Validate Folder
-        folder = Abolish.attempt(folder, { object: createFolderRule });
-
         try {
             const { data } = await this.#v1.post(
                 `project/${folder.project}/folder`,

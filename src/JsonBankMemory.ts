@@ -15,7 +15,7 @@ class JsonBankMemory extends ObjectCollection {
     }
 
     /**
-     * Returns axios headers config for JSB_PUB_KEY only from memory
+     * Returns axios headers config for JSB_PUB_KEY from memory
      */
     axiosPrvKeyHeader(data: AxiosRequestConfig = {}) {
         return {
