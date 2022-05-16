@@ -39,6 +39,17 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(content, content2);
     });
 
+    test("getContent(): Get public content by id with {jsbQuery}", async (assert) => {
+        const content = await jsb.getContent(testDoc.id, {
+            apply: "pick",
+            args: ["name"] /// only pick name
+        });
+
+        assert.deepEqual(content, {
+            name: "Js SDK Test File"
+        });
+    });
+
     test("getContentMeta(): Get public content meta by ID", async (assert) => {
         const meta = await jsb.getContentMeta(testDoc.id);
         // test with .json extension
@@ -64,6 +75,17 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(content, content2);
     });
 
+    test("getContentByPath(): Get public content by path with {jsbQuery}", async (assert) => {
+        const content = await jsb.getContentByPath("jsonbank/js-sdk-test/index", {
+            apply: "pick",
+            args: ["name"] /// only pick name
+        });
+
+        assert.deepEqual(content, {
+            name: "Js SDK Test File"
+        });
+    });
+
     test("getContentMetaByPath(): Get public content meta by path", async (assert) => {
         const meta = await jsb.getContentMetaByPath("jsonbank/js-sdk-test/index");
         // test with .json extension
@@ -84,6 +106,19 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.isObject(pkg);
         assert.equal(pkg.name, "jsonbank");
         assert.equal(pkg.author, "jsonbankio");
+    });
+
+    test("getGithubContent(): Get content from github with jsbQuery", async (assert) => {
+        const pkg = await jsb.getGithubContent(
+            "jsonbankio/jsonbank-js/package.json",
+            { apply: "pick", args: ["name", "author"] }
+        );
+
+        assert.isObject(pkg);
+        assert.deepEqual(pkg, {
+            name: "jsonbank",
+            author: "jsonbankio"
+        });
     });
 });
 
