@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
-import { jsb_Query } from "./helpers";
+import { jsb_Query, JSBQuery } from "./helpers";
 import JsonBankMemory from "./JsonBankMemory";
-import { JSB_Query, JSB_QueryVars, JSB_Response, JsonBankConfig } from "./types";
+import { JSB_Response, JsonBankConfig } from "./types";
 import fs from "fs";
 import path from "path";
 
@@ -121,10 +121,18 @@ class JsonBank {
     /**
      * Get Public Content by ID or Path
      * @param idOrPath
+     * @param jsbQuery
+     * @param queries
      */
-    async getContent<T = any>(idOrPath: string): Promise<T> {
+    async getContent<T = any>(
+        idOrPath: string,
+        jsbQuery: JSBQuery | JSBQuery[] = [],
+        queries: Record<string, any> = {}
+    ): Promise<T> {
         try {
-            const { data } = await this.#api.get("f/" + idOrPath);
+            const { data } = await this.#api.get("f/" + idOrPath, {
+                params: JsonBank.queryParam(jsbQuery, queries)
+            });
             return data;
         } catch (err) {
             throw this.___handleHttpError(err);
@@ -149,9 +157,15 @@ class JsonBank {
     /**
      * Get Public content by path
      * @param path
+     * @param jsbQuery
+     * @param queries
      */
-    async getContentByPath<T = any>(path: string): Promise<T> {
-        return this.getContent<T>(path);
+    async getContentByPath<T = any>(
+        path: string,
+        jsbQuery: JSBQuery | JSBQuery[] = [],
+        queries: Record<string, any> = {}
+    ): Promise<T> {
+        return this.getContent<T>(path, jsbQuery, queries);
     }
 
     /**
@@ -165,32 +179,54 @@ class JsonBank {
     /**
      * Get  a json file from GitHub
      * @param path
+     * @param jsbQuery
+     * @param queries
      */
-    async getGithubContent<T = any>(path: string): Promise<T> {
+    async getGithubContent<T = any>(
+        path: string,
+        jsbQuery: JSBQuery | JSBQuery[] = [],
+        queries: Record<string, any> = {}
+    ): Promise<T> {
         try {
-            const { data } = await this.#api.get("gh/" + path);
+            const { data } = await this.#api.get("gh/" + path, {
+                params: JsonBank.queryParam(jsbQuery, queries)
+            });
             return data;
         } catch (err) {
             throw this.___handleHttpError(err);
         }
     }
 
+    private static queryParam(
+        query?: JSBQuery | JSBQuery[],
+        queries: Record<string, any> = {}
+    ) {
+        if (!query) return {};
+
+        const [q, additionalQueries] = jsb_Query(query);
+
+        if (!q) return {};
+
+        return {
+            query: q,
+            ...(additionalQueries || {}),
+            ...queries
+        };
+    }
+
     /**
      * Get own Content by ID or Path
      * @param idOrPath
-     * @param options
+     * @param jsbQuery
+     * @param queries
      */
     async getOwnContent<T = any>(
         idOrPath: string,
-        options: {
-            query?: JSB_Query;
-            vars?: JSB_QueryVars;
-        } = {}
+        jsbQuery: JSBQuery[] = [],
+        queries: Record<string, any> = {}
     ): Promise<T> {
         const config = this.memory.axiosPubKeyHeader({
-            params: {
-                ...(options.query ? jsb_Query(options.query, options.vars) : {})
-            }
+            params: JsonBank.queryParam(jsbQuery, queries)
         });
 
         try {
@@ -219,16 +255,15 @@ class JsonBank {
     /**
      * Get own Content by Id or Path
      * @param path
-     * @param options
+     * @param jsbQuery
+     * @param queries
      */
     async getOwnContentByPath<T = any>(
         path: string,
-        options: {
-            query?: JSB_Query;
-            vars?: JSB_QueryVars;
-        } = {}
+        jsbQuery: JSBQuery[] = [],
+        queries: Record<string, any> = {}
     ): Promise<T> {
-        return this.getOwnContent<T>(path, options);
+        return this.getOwnContent<T>(path, jsbQuery, queries);
     }
 
     /**

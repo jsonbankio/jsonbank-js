@@ -7,8 +7,8 @@ export type JsonBankConfig = {
     host?: string;
 };
 
-export type JSB_Query = string | string[];
-export type JSB_QueryVars = Record<string, any>;
+// export type JSB_Query = string | string[];
+// export type JSB_QueryVars = Record<string, any>;
 
 export declare namespace JSB_Response {
     /**
