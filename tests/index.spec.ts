@@ -185,8 +185,6 @@ test.group("JsonBank: Authenticated", (group) => {
             project
         });
 
-        console.log(document);
-
         testDoc.id = document.id;
     });
 

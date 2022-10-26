@@ -75,9 +75,7 @@ export function jsb_Query(
     let $queries: string[] = [];
     let additionalQueries = {} as Record<string, any>;
 
-    if (!Array.isArray(queries)) {
-        queries = [queries];
-    }
+    if (!Array.isArray(queries)) queries = [queries];
 
     for (const q of queries) {
         let query = q.apply;
@@ -142,6 +140,10 @@ export function jsb_generateModifierHelpers() {
     return helpers;
 }
 
+/**
+ * Make  path from document object
+ * @param document
+ */
 export function jsb_makeDocumentPath(
     document: Pick<JSB_Body.CreateDocument, "name" | "folder" | "project">
 ) {
