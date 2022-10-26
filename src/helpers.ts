@@ -1,6 +1,8 @@
 /**
  * Allowed Query modifiers
  */
+import { JSB_Body } from "./types";
+
 const modifiers = [
     // Array
     "chunk",
@@ -138,4 +140,12 @@ export function jsb_generateModifierHelpers() {
     }
 
     return helpers;
+}
+
+export function jsb_makeDocumentPath(
+    document: Pick<JSB_Body.CreateDocument, "name" | "folder" | "project">
+) {
+    const folder =
+        document.folder && document.folder.length ? document.folder + "/" : "";
+    return `${document.project}/${folder}${document.name}`;
 }

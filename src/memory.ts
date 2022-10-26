@@ -28,4 +28,4 @@ class JsonBankMemory extends ObjectCollection {
     }
 }
 
-export = JsonBankMemory;
+export default JsonBankMemory;

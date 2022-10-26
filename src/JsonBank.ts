@@ -1,9 +1,7 @@
 import axios, { AxiosInstance } from "axios";
-import { jsb_Query, JSBQuery } from "./helpers";
-import JsonBankMemory from "./JsonBankMemory";
-import { JSB_Response, JsonBankConfig } from "./types";
-import fs from "fs";
-import path from "path";
+import { jsb_makeDocumentPath, jsb_Query, JSBQuery } from "./helpers";
+import Memory from "./memory";
+import { JSB_Body, JSB_Response, JsonBankConfig } from "./types";
 
 export class JSB_Error extends Error {
     code?: string;
@@ -19,7 +17,7 @@ export class JSB_Error extends Error {
  */
 class JsonBank {
     private config!: JsonBankConfig;
-    private memory!: JsonBankMemory;
+    private memory!: Memory;
     #api: AxiosInstance;
     #v1: AxiosInstance;
 
@@ -46,7 +44,7 @@ class JsonBank {
 
         // Set Memory
         Object.defineProperty(this, "memory", {
-            value: new JsonBankMemory(),
+            value: new Memory(),
             enumerable: false
         });
 
@@ -64,7 +62,7 @@ class JsonBank {
      * @reason redundancy
      * @param err
      */
-    private ___handleHttpError(err: any) {
+    protected ___handleHttpError(err: any) {
         if (err.response) {
             if (err.response.data && err.response.data.error) {
                 const error = err.response.data.error;
@@ -140,7 +138,7 @@ class JsonBank {
     }
 
     /**
-     * Get Public Content Meta by Id or Path
+     * Get Public Content Meta by ID or Path
      * @param idOrPath
      */
     async getContentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
@@ -149,9 +147,17 @@ class JsonBank {
                 params: { meta: true }
             });
             return data;
-        } catch (err) {
+        } catch (err: any) {
             throw this.___handleHttpError(err);
         }
+    }
+
+    /**
+     * Get Public content meta by path
+     * @param path
+     */
+    async getContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
+        return this.getContentMeta(path);
     }
 
     /**
@@ -166,14 +172,6 @@ class JsonBank {
         queries: Record<string, any> = {}
     ): Promise<T> {
         return this.getContent<T>(path, jsbQuery, queries);
-    }
-
-    /**
-     * Get Public content meta by path
-     * @param path
-     */
-    async getContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
-        return this.getContentMeta(path);
     }
 
     /**
@@ -197,7 +195,7 @@ class JsonBank {
         }
     }
 
-    private static queryParam(
+    protected static queryParam(
         query?: JSBQuery | JSBQuery[],
         queries: Record<string, any> = {}
     ) {
@@ -253,7 +251,15 @@ class JsonBank {
     }
 
     /**
-     * Get own Content by Id or Path
+     * Get own Content Meta by ID or Path
+     * @param path
+     */
+    async getOwnContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
+        return this.getOwnContentMeta(path);
+    }
+
+    /**
+     * Get own Content by ID or Path
      * @param path
      * @param jsbQuery
      * @param queries
@@ -264,14 +270,6 @@ class JsonBank {
         queries: Record<string, any> = {}
     ): Promise<T> {
         return this.getOwnContent<T>(path, jsbQuery, queries);
-    }
-
-    /**
-     * Get own Content Meta by Id or Path
-     * @param path
-     */
-    async getOwnContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
-        return this.getOwnContentMeta(path);
     }
 
     /**
@@ -317,12 +315,7 @@ class JsonBank {
      * Create new document
      * @param document
      */
-    async createDocument(document: {
-        name: string;
-        project: string;
-        folder?: string;
-        content?: string | object;
-    }) {
+    async createDocument(document: JSB_Body.CreateDocument) {
         if (typeof document.content === "object") {
             document.content = JSON.stringify(document.content, null, 0);
         }
@@ -341,35 +334,35 @@ class JsonBank {
     }
 
     /**
-     * Upload Document from file system
+     * Create Document if not exists
+     * This method will try to create a document
+     * If it fails with code "name.exists", it will try to get the document by meta
      * @param document
      */
-    uploadDocument(document: {
-        file: string;
-        project: string;
-        name?: string;
-        folder?: string;
-    }) {
-        // check if file exists
-        if (!fs.existsSync(document.file)) {
-            throw new Error(`File does not exist: ${document.file}`);
-        }
-
-        // Set name to file name if none is defined
-        if (!document.name) {
-            document.name = path.basename(document.file);
-        }
-
+    async createDocumentIfNotExists(
+        document: JSB_Body.CreateDocument
+    ): Promise<JSB_Response.CreateDocument> {
         try {
-            return this.createDocument({
-                name: document.name,
-                project: document.project,
-                // Read file.
-                content: fs.readFileSync(document.file, "utf8"),
-                folder: document.folder
-            });
-        } catch (err) {
-            throw this.___handleHttpError(err);
+            return await this.createDocument(document);
+        } catch (err: any) {
+            // If document already exists
+            // find document by meta and return it
+            if (err.code && err.code === "name.exists") {
+                const doc = await this.getOwnContentMetaByPath(
+                    jsb_makeDocumentPath(document)
+                );
+
+                return {
+                    id: doc.id,
+                    path: doc.path,
+                    name: document.name,
+                    project: doc.project,
+                    createdAt: doc.createdAt,
+                    exists: true
+                };
+            }
+
+            throw err;
         }
     }
 

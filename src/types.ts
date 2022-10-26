@@ -1,3 +1,5 @@
+export type NumberAndString = { number: number; string: string };
+
 /**
  * Json Bank Class Config
  */
@@ -31,6 +33,9 @@ export declare namespace JSB_Response {
         path: string;
         project: string;
         createdAt: string;
+
+        // module added
+        exists?: boolean;
     };
 
     /**
@@ -40,8 +45,18 @@ export declare namespace JSB_Response {
     type ContentMeta = {
         id: string;
         project: string;
+        contentSize: NumberAndString;
         path: string;
         updatedAt: string;
         createdAt: string;
+    };
+}
+
+export declare namespace JSB_Body {
+    type CreateDocument = {
+        name: string;
+        project: string;
+        folder?: string;
+        content?: string | object;
     };
 }
