@@ -373,9 +373,9 @@ class JsonBank {
                 this.memory.axiosPrvKeyHeader()
             );
 
-            return data as { delete: boolean };
+            return data as { deleted: boolean };
         } catch (err) {
-            return { delete: false };
+            return { deleted: false };
         }
     }
 
