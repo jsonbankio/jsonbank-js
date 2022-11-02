@@ -12,8 +12,8 @@
     "prepublishOnly": "npm run test && npm run build",
     "build": "npx tsc",
     "watch": "npx tsc --watch",
-    "test": "node japaFile.js",
-    "test-dev": "nodemon japaFile.js"
+    "test": "node ./japaFile.js",
+    "test-dev": "nodemon ./japaFile.js"
   },
   "dependencies": {
     "axios": "0.27.2",
