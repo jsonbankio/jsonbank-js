@@ -23,6 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - env:
+        CI: true
         JSB_PUBLIC_KEY: ${{ secrets.JSB_PUBLIC_KEY }}
         JSB_PRIVATE_KEY: ${{ secrets.JSB_PRIVATE_KEY }}
     - name: Use Node.js ${{ matrix.node-version }}
