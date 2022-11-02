@@ -1,6 +1,6 @@
 {
   "name": "jsonbank",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Official Jsonbank Node Package.",
   "main": "index.js",
   "types": "index.d.ts",
@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "axios": "0.27.2",
-
     "object-collection": "^3.0.1"
   },
   "devDependencies": {
