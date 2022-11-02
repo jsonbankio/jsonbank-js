@@ -17,8 +17,8 @@ jobs:
       JSB_PUBLIC_KEY: ${{ secrets.JSB_PUBLIC_KEY }}
       JSB_PRIVATE_KEY: ${{ secrets.JSB_PRIVATE_KEY }}
 
-    strategy:
-      matrix:
+#    strategy:
+#      matrix:
         #        node-version: [ 16.x ]
 #        node-version: [ 14.x, 16.x, 18.x ]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
