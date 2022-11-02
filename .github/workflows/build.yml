@@ -13,24 +13,24 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CI: true
+      JSB_PUBLIC_KEY: ${{ secrets.JSB_PUBLIC_KEY }}
+      JSB_PRIVATE_KEY: ${{ secrets.JSB_PRIVATE_KEY }}
 
     strategy:
       matrix:
-        node-version: [16.x]
-#        node-version: [14.x, 16.x, 18.x]
+        node-version: [ 16.x ]
+        #        node-version: [14.x, 16.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - env:
-        CI: true
-        JSB_PUBLIC_KEY: ${{ secrets.JSB_PUBLIC_KEY }}
-        JSB_PRIVATE_KEY: ${{ secrets.JSB_PRIVATE_KEY }}
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
