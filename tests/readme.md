@@ -8,7 +8,7 @@ JSB_PUBLIC_KEY="your public key"
 JSB_PRIVATE_KEY="your private key"
 ```
 
-Create a project called `js-sdk-test` and a folder called `folder` inside the project.
+Create a project called `sdk-test` and a folder called `folder` inside the project.
 
 Then run
 - `npm run build` - to build typescript files
