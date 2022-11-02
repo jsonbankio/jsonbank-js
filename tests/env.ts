@@ -13,4 +13,6 @@ const env = isCi
           JSB_PRIVATE_KEY: Env.is.string()
       });
 
+console.log("env", env);
+
 export default env;
