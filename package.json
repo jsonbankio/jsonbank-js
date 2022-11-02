@@ -17,10 +17,13 @@
   },
   "dependencies": {
     "axios": "0.27.2",
-    "japa": "^4.0.0",
+
     "object-collection": "^3.0.1"
   },
   "devDependencies": {
+    "is-ci": "^3.0.1",
+    "japa": "^4.0.0",
+    "@types/is-ci": "^3.0.0",
     "@types/node": "^18.11.5",
     "@xpresser/env": "^2.0.10",
     "nodemon": "^2.0.20",

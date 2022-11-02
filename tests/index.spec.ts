@@ -5,7 +5,7 @@ import os from "os";
 import { type JSB_Error } from "../src/JsonBank";
 
 const TestFileContent = {
-    name: "Jsonbank SDK Test File",
+    name: "JsonBank SDK Test File",
     author: "jsonbank"
 };
 
@@ -82,7 +82,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
 
         assert.deepEqual(content, {
-            name: "Js SDK Test File"
+            name: TestFileContent.name
         });
     });
 
@@ -115,7 +115,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
 
         assert.deepEqual(content, {
-            name: "Js SDK Test File"
+            name: TestFileContent.name
         });
     });
 
@@ -159,7 +159,7 @@ test.group("JsonBank: Authenticated", (group) => {
     group.timeout(10000);
 
     let jsb: JsonBankNode;
-    const project = "js-sdk-test";
+    const project = "sdk-test";
     const testDoc = {
         id: "", // will be gotten from the server before the test
         path: `${project}/index`
@@ -197,10 +197,7 @@ test.group("JsonBank: Authenticated", (group) => {
     test("getOwnContent():", async (assert) => {
         const content = await jsb.getOwnContent(testDoc.id);
 
-        assert.deepEqual(content, {
-            name: "Js SDK Test File",
-            author: "jsonbank"
-        });
+        assert.deepEqual(content, TestFileContent);
     });
 
     test("getOwnDocumentMeta():", async (assert) => {
@@ -210,10 +207,7 @@ test.group("JsonBank: Authenticated", (group) => {
 
     test("getOwnContentByPath():", async (assert) => {
         const content = await jsb.getOwnContentByPath(`${project}/index`);
-        assert.deepEqual(content, {
-            name: "Js SDK Test File",
-            author: "jsonbank"
-        });
+        assert.deepEqual(content, TestFileContent);
     });
 
     test("getOwnDocumentMetaByPath():", async (assert) => {
@@ -229,8 +223,7 @@ test.group("JsonBank: Authenticated", (group) => {
 
     test("updateContent():", async (assert) => {
         const newContent = {
-            name: "Js SDK Test File",
-            author: "jsonbank",
+            ...TestFileContent,
             updatedAt: new Date().toISOString()
         };
 
@@ -243,10 +236,7 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.deepEqual(newContent, newContentFromServer);
 
         // revert changes
-        await jsb.updateOwnDocument(`${project}/index`, {
-            name: "Js SDK Test File",
-            author: "jsonbank"
-        });
+        await jsb.updateOwnDocument(`${project}/index`, TestFileContent);
     });
 
     test("createFolder():", async (assert) => {
