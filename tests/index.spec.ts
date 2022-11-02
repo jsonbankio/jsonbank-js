@@ -3,6 +3,7 @@ import env from "./env";
 import JsonBankNode from "../src/JsonBankNode";
 import os from "os";
 import { type JSB_Error } from "../src/JsonBank";
+import isCi from "is-ci";
 
 const TestFileContent = {
     name: "JsonBank SDK Test File",
@@ -225,13 +226,20 @@ test.group("JsonBank: Authenticated", (group) => {
             updatedAt: new Date().toISOString()
         };
 
-        await jsb.updateOwnDocument(`${project}/index`, newContent);
-
-        const newContentFromServer = await jsb.getOwnContentByPath(
-            `${project}/index`
+        const { changed } = await jsb.updateOwnDocument(
+            `${project}/index`,
+            newContent
         );
 
-        assert.deepEqual(newContent, newContentFromServer);
+        assert.isTrue(changed);
+
+        if (!isCi) {
+            const newContentFromServer = await jsb.getOwnContentByPath(
+                `${project}/index`
+            );
+
+            assert.deepEqual(newContent, newContentFromServer);
+        }
 
         // revert changes
         await jsb.updateOwnDocument(`${project}/index`, TestFileContent);
