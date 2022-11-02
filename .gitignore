@@ -4,5 +4,5 @@ node_modules
 tests/.env
 
 *.js
-!fix.js
+!japaFile.js
 *.d.ts
