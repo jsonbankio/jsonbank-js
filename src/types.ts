@@ -40,7 +40,7 @@ export declare namespace JSB_Response {
 
     /**
      * Get Content Meta endpoint response
-     * getContentMeta() response
+     * getDocumentMeta() response
      */
     type ContentMeta = {
         id: string;

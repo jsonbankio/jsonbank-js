@@ -141,7 +141,7 @@ class JsonBank {
      * Get Public Content Meta by ID or Path
      * @param idOrPath
      */
-    async getContentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
+    async getDocumentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
         try {
             const { data } = await this.#api.get("meta/f/" + idOrPath, {
                 params: { meta: true }
@@ -156,8 +156,8 @@ class JsonBank {
      * Get Public content meta by path
      * @param path
      */
-    async getContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
-        return this.getContentMeta(path);
+    async getDocumentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
+        return this.getDocumentMeta(path);
     }
 
     /**
@@ -239,7 +239,7 @@ class JsonBank {
      * Get own Content Meta by ID or Path
      * @param idOrPath
      */
-    async getOwnContentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
+    async getOwnDocumentMeta(idOrPath: string): Promise<JSB_Response.ContentMeta> {
         const config = this.memory.axiosPubKeyHeader();
 
         try {
@@ -254,8 +254,8 @@ class JsonBank {
      * Get own Content Meta by ID or Path
      * @param path
      */
-    async getOwnContentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
-        return this.getOwnContentMeta(path);
+    async getOwnDocumentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
+        return this.getOwnDocumentMeta(path);
     }
 
     /**
@@ -276,7 +276,7 @@ class JsonBank {
      * Check if a file exists
      * @param idOrPath
      */
-    async hasOwnContent(idOrPath: string): Promise<boolean> {
+    async hasOwnDocument(idOrPath: string): Promise<boolean> {
         try {
             await this.getOwnContent(idOrPath);
             return true;
@@ -290,7 +290,7 @@ class JsonBank {
      * @param idOrPath
      * @param content
      */
-    async updateOwnContent(
+    async updateOwnDocument(
         idOrPath: string,
         content: string | object
     ): Promise<{ id: string; changed: boolean; message: string }> {
@@ -348,7 +348,7 @@ class JsonBank {
             // If document already exists
             // find document by meta and return it
             if (err.code && err.code === "name.exists") {
-                const doc = await this.getOwnContentMetaByPath(
+                const doc = await this.getOwnDocumentMetaByPath(
                     jsb_makeDocumentPath(document)
                 );
 
