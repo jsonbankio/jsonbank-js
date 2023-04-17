@@ -1,11 +1,12 @@
 import ObjectCollection from "object-collection";
 import { AxiosRequestConfig } from "axios";
+// import { AxiosRequestConfig } from "axios";
 
 class JsonBankMemory extends ObjectCollection {
     /**
      * Returns axios headers config for JSB_PUB_KEY only from memory
      */
-    axiosPubKeyHeader(data: AxiosRequestConfig = {}) {
+    axiosPubKeyHeader(data: AxiosRequestConfig = {}): Record<string, any> {
         return {
             headers: {
                 "jsb-pub-key": this.get("axios.headers.jsb-pub-key")
@@ -17,7 +18,7 @@ class JsonBankMemory extends ObjectCollection {
     /**
      * Returns axios headers config for JSB_PUB_KEY from memory
      */
-    axiosPrvKeyHeader(data: AxiosRequestConfig = {}) {
+    axiosPrvKeyHeader(data: AxiosRequestConfig = {}): Record<string, any> {
         return {
             headers: {
                 "jsb-pub-key": this.get("axios.headers.jsb-pub-key"),

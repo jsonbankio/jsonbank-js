@@ -146,6 +146,7 @@ class JsonBank {
             const { data } = await this.#api.get("meta/f/" + idOrPath, {
                 params: { meta: true }
             });
+
             return data;
         } catch (err: any) {
             throw this.___handleHttpError(err);
