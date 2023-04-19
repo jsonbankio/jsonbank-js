@@ -29,7 +29,7 @@ const NewDocumentExpectedKeys = [
 ];
 
 test.group("JsonBank: Not Authenticated", (group) => {
-    group.timeout(15000);
+    group.timeout(env.JSB_TIMEOUT);
 
     let jsb: JsonBankNode;
     const testDoc = {
@@ -155,7 +155,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
 });
 
 test.group("JsonBank: Authenticated", (group) => {
-    group.timeout(15000);
+    group.timeout(env.JSB_TIMEOUT);
 
     let jsb: JsonBankNode;
     const project = "sdk-test";
