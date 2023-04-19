@@ -299,4 +299,70 @@ test.group("JsonBank: Authenticated", (group) => {
         // test project name
         assert.equal(doc.project, project);
     });
+
+    test("getFolder", async (assert) => {
+        const folder = await jsb.getFolder(`${project}/folder`);
+
+        assert.isObject(folder);
+        assert.hasAllKeys(folder, [
+            "id",
+            "name",
+            "path",
+            "project",
+            "createdAt",
+            "updatedAt"
+        ]);
+
+        // test project name
+        assert.equal(folder.project, project);
+
+        // get folder by id
+        const folder2 = await jsb.getFolder(folder.id);
+
+        assert.deepEqual(folder, folder2);
+    });
+
+    test("getFolder with stats", async (assert) => {
+        const folder = await jsb.getFolderWithStats(`${project}/folder`);
+
+        assert.isObject(folder);
+        assert.hasAllKeys(folder, [
+            "id",
+            "name",
+            "path",
+            "project",
+            "createdAt",
+            "updatedAt",
+            "stats"
+        ]);
+
+        // test project name
+        assert.equal(folder.project, project);
+
+        // get folder by id
+        const folder2 = await jsb.getFolderWithStats(folder.id);
+
+        assert.deepEqual(folder, folder2);
+    });
+
+    test("createFolderIfNotExists", async (assert) => {
+        const folder = await jsb.createFolderIfNotExists({
+            name: "folder",
+            project
+        });
+
+        assert.isObject(folder);
+        assert.hasAllKeys(folder, [
+            "id",
+            "name",
+            "path",
+            "project",
+            "createdAt",
+            "updatedAt"
+        ]);
+
+        // check folder name matches
+        assert.equal(folder.name, "folder");
+        assert.equal(folder.project, project);
+    });
 });

@@ -49,7 +49,7 @@ const modifiers = [
     "min",
     "sum"
 ] as const;
-export type Modifier = typeof modifiers[number];
+export type Modifier = (typeof modifiers)[number];
 
 export type JSBVar = { json: string };
 export type JSBVarJson = { var: string };
@@ -150,4 +150,15 @@ export function jsb_makeDocumentPath(
     const folder =
         document.folder && document.folder.length ? document.folder + "/" : "";
     return `${document.project}/${folder}${document.name}`;
+}
+
+/**
+ * Make path from folder object
+ */
+export function jsb_makeFolderPath(
+    folder: Pick<JSB_Body.CreateFolder, "name" | "folder" | "project">
+) {
+    const parentFolder =
+        folder.folder && folder.folder.length ? folder.folder + "/" : "";
+    return `${folder.project}/${parentFolder}${folder.name}`;
 }

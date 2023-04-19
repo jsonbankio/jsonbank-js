@@ -1,5 +1,10 @@
 import axios, { AxiosInstance } from "axios";
-import { jsb_makeDocumentPath, jsb_Query, JSBQuery } from "./helpers";
+import {
+    jsb_makeDocumentPath,
+    jsb_makeFolderPath,
+    jsb_Query,
+    JSBQuery
+} from "./helpers";
 import Memory from "./memory";
 import { JSB_Body, JSB_Response, JsonBankConfig } from "./types";
 
@@ -313,7 +318,7 @@ class JsonBank {
     }
 
     /**
-     * Create new document
+     * Create a new document
      * @param document
      */
     async createDocument(document: JSB_Body.CreateDocument) {
@@ -322,7 +327,7 @@ class JsonBank {
         }
 
         try {
-            const { data } = await this.#v1.post<JSB_Response.CreateDocument>(
+            const { data } = await this.#v1.post<JSB_Response.NewDocument>(
                 `project/${document.project}/document`,
                 { ...document },
                 this.memory.axiosPrvKeyHeader()
@@ -335,19 +340,19 @@ class JsonBank {
     }
 
     /**
-     * Create Document if not exists
+     * Create Document if not exists,
      * This method will try to create a document
      * If it fails with code "name.exists", it will try to get the document by meta
      * @param document
      */
     async createDocumentIfNotExists(
         document: JSB_Body.CreateDocument
-    ): Promise<JSB_Response.CreateDocument> {
+    ): Promise<JSB_Response.NewDocument> {
         try {
             return await this.createDocument(document);
         } catch (err: any) {
-            // If document already exists
-            // find document by meta and return it
+            // If a document already exists
+            // find a document by meta and return it
             if (err.code && err.code === "name.exists") {
                 const doc = await this.getOwnDocumentMetaByPath(
                     jsb_makeDocumentPath(document)
@@ -367,6 +372,10 @@ class JsonBank {
         }
     }
 
+    /**
+     * Delete own document
+     * @param idOrPath
+     */
     async deleteDocument(idOrPath: string) {
         try {
             const { data } = await this.#v1.delete(
@@ -380,22 +389,67 @@ class JsonBank {
         }
     }
 
-    async createFolder(folder: { name: string; project: string; folder?: string }) {
+    /**
+     * Get Folder by ID or Path
+     */
+    async getFolder(idOrPath: string, includeStats = false) {
         try {
-            const { data } = await this.#v1.post(
+            const { data } = await this.#v1.get<JSB_Response.Folder>(
+                "folder/" + idOrPath,
+                this.memory.axiosPubKeyHeader({
+                    params: { stats: includeStats }
+                })
+            );
+
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
+     * Get Folder with stats by ID or Path
+     */
+    async getFolderWithStats(idOrPath: string) {
+        return this.getFolder(idOrPath, true);
+    }
+
+    /**
+     * Create a new folder
+     * @param folder
+     */
+    async createFolder(folder: JSB_Body.CreateFolder) {
+        try {
+            const { data } = await this.#v1.post<JSB_Response.Folder>(
                 `project/${folder.project}/folder`,
                 folder,
                 this.memory.axiosPrvKeyHeader()
             );
 
-            return data as {
-                id: string;
-                name: string;
-                path: string;
-                project: string;
-            };
+            data.exists = false;
+
+            return data;
         } catch (err) {
             throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
+     * Create Folder if not exists
+     */
+    async createFolderIfNotExists(folder: JSB_Body.CreateFolder) {
+        try {
+            return await this.createFolder(folder);
+        } catch (err: any) {
+            // If folder already exists
+            // find folder by meta and return it
+            if (err.code && err.code === "name.exists") {
+                const doc = await this.getFolder(jsb_makeFolderPath(folder));
+                doc.exists = true;
+                return doc;
+            }
+
+            throw err;
         }
     }
 }

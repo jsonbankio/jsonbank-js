@@ -27,7 +27,7 @@ export declare namespace JSB_Response {
      * Create Document endpoint response
      * createDocument(): response
      */
-    type CreateDocument = {
+    type NewDocument = {
         id: string;
         name: string;
         path: string;
@@ -50,13 +50,45 @@ export declare namespace JSB_Response {
         updatedAt: string;
         createdAt: string;
     };
+
+    /**
+     * Folder Stats
+     */
+    type FolderStats = {
+        documents: number;
+        folders: number;
+    };
+
+    /**
+     * Get Folder endpoint response
+     */
+    type Folder = {
+        id: string;
+        name: string;
+        path: string;
+        project: string;
+        createdAt: string;
+        updatedAt: string;
+        // stats field is optional and will exist only when requested
+        stats?: FolderStats;
+        // added by createFolderIfNotExists()
+        exists?: boolean;
+    };
 }
 
 export declare namespace JSB_Body {
+    /**
+     * Create Document endpoint body
+     */
     type CreateDocument = {
         name: string;
         project: string;
         folder?: string;
         content?: string | object;
     };
+
+    /**
+     * Create Folder endpoint body
+     */
+    type CreateFolder = { name: string; project: string; folder?: string };
 }
