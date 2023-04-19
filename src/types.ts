@@ -62,7 +62,7 @@ export declare namespace JSB_Response {
     /**
      * Get Folder endpoint response
      */
-    type Folder = {
+    interface Folder {
         id: string;
         name: string;
         path: string;
@@ -71,9 +71,15 @@ export declare namespace JSB_Response {
         updatedAt: string;
         // stats field is optional and will exist only when requested
         stats?: FolderStats;
+    }
+
+    /**
+     * New Folder endpoint response
+     */
+    interface NewFolder extends Folder {
         // added by createFolderIfNotExists()
         exists?: boolean;
-    };
+    }
 }
 
 export declare namespace JSB_Body {

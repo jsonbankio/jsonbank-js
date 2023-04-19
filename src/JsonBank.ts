@@ -418,15 +418,13 @@ class JsonBank {
      * Create a new folder
      * @param folder
      */
-    async createFolder(folder: JSB_Body.CreateFolder) {
+    async createFolder(folder: JSB_Body.CreateFolder): Promise<JSB_Response.Folder> {
         try {
             const { data } = await this.#v1.post<JSB_Response.Folder>(
                 `project/${folder.project}/folder`,
                 folder,
                 this.memory.axiosPrvKeyHeader()
             );
-
-            data.exists = false;
 
             return data;
         } catch (err) {
@@ -437,7 +435,9 @@ class JsonBank {
     /**
      * Create Folder if not exists
      */
-    async createFolderIfNotExists(folder: JSB_Body.CreateFolder) {
+    async createFolderIfNotExists(
+        folder: JSB_Body.CreateFolder
+    ): Promise<JSB_Response.NewFolder> {
         try {
             return await this.createFolder(folder);
         } catch (err: any) {
@@ -445,8 +445,8 @@ class JsonBank {
             // find folder by meta and return it
             if (err.code && err.code === "name.exists") {
                 const doc = await this.getFolder(jsb_makeFolderPath(folder));
-                doc.exists = true;
-                return doc;
+
+                return { ...doc, exists: true };
             }
 
             throw err;

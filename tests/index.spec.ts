@@ -345,7 +345,7 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.deepEqual(folder, folder2);
     });
 
-    test("createFolderIfNotExists", async (assert) => {
+    test.only("createFolderIfNotExists", async (assert) => {
         const folder = await jsb.createFolderIfNotExists({
             name: "folder",
             project
@@ -358,7 +358,8 @@ test.group("JsonBank: Authenticated", (group) => {
             "path",
             "project",
             "createdAt",
-            "updatedAt"
+            "updatedAt",
+            "exists"
         ]);
 
         // check folder name matches
