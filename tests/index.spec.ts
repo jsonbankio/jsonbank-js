@@ -281,6 +281,8 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.hasAllKeys(doc, NewDocumentExpectedKeys);
         // test project name
         assert.equal(doc.project, project);
+
+        await jsb.deleteDocument(`${project}/folder/new_doc`);
     });
 
     test("uploadDocument():", async (assert) => {
