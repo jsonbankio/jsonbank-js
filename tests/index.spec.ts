@@ -40,9 +40,9 @@ test.group("JsonBank: Not Authenticated", (group) => {
     group.before(async () => {
         jsb = new JsonBankNode({ host: env.JSB_HOST });
 
-        // Find id of test document
+        // Find id of a test document
         try {
-            const index = await jsb.getDocumentMetaByPath(testDoc.path);
+            const index = await jsb.getDocumentMeta(testDoc.path);
             testDoc.id = index.id;
         } catch (e: any) {
             if (e.code === "notFound") {
@@ -76,6 +76,16 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(content, content2);
     });
 
+    test("getContentAsString(): Get public content by Id", async (assert) => {
+        const content = await jsb.getContentAsString(testDoc.id);
+        // test with .json extension
+        const content2 = await jsb.getContentAsString(testDoc.id + ".json");
+
+        assert.deepEqual(content, JSON.stringify(TestFileContent));
+
+        assert.deepEqual(content, content2);
+    });
+
     test("getContent(): Get public content by id with {jsbQuery}", async (assert) => {
         const content = await jsb.getContent(testDoc.id, {
             apply: "pick",
@@ -97,18 +107,18 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(meta, meta2);
     });
 
-    test("getContentByPath(): Get public content by path", async (assert) => {
-        const content = await jsb.getContentByPath("jsonbank/sdk-test/index");
+    test("getContent(): Get public content by path", async (assert) => {
+        const content = await jsb.getContent("jsonbank/sdk-test/index");
         // test with .json extension
-        const content2 = await jsb.getContentByPath("jsonbank/sdk-test/index.json");
+        const content2 = await jsb.getContent("jsonbank/sdk-test/index.json");
 
         assert.deepEqual(content, TestFileContent);
 
         assert.deepEqual(content, content2);
     });
 
-    test("getContentByPath(): Get public content by path with {jsbQuery}", async (assert) => {
-        const content = await jsb.getContentByPath("jsonbank/sdk-test/index", {
+    test("getContent(): Get public content by path with {jsbQuery}", async (assert) => {
+        const content = await jsb.getContent("jsonbank/sdk-test/index", {
             apply: "pick",
             args: ["name"] /// only pick name
         });
@@ -118,12 +128,10 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
     });
 
-    test("getDocumentMetaByPath(): Get public content meta by path", async (assert) => {
-        const meta = await jsb.getDocumentMetaByPath("jsonbank/sdk-test/index");
+    test("getDocumentMeta(): Get public content meta by path", async (assert) => {
+        const meta = await jsb.getDocumentMeta("jsonbank/sdk-test/index");
         // test with .json extension
-        const meta2 = await jsb.getDocumentMetaByPath(
-            "jsonbank/sdk-test/index.json"
-        );
+        const meta2 = await jsb.getDocumentMeta("jsonbank/sdk-test/index.json");
 
         assert.hasAllKeys(meta, MetaExpectedKeys);
 
@@ -199,18 +207,23 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.deepEqual(content, TestFileContent);
     });
 
+    test("getOwnContentAsString(): by path", async (assert) => {
+        const content = await jsb.getOwnContentAsString(`${project}/index`);
+        assert.deepEqual(content, JSON.stringify(TestFileContent));
+    });
+
     test("getOwnDocumentMeta():", async (assert) => {
         const meta = await jsb.getOwnDocumentMeta(testDoc.id);
         assert.hasAllKeys(meta, MetaExpectedKeys);
     });
 
-    test("getOwnContentByPath():", async (assert) => {
-        const content = await jsb.getOwnContentByPath(`${project}/index`);
+    test("getOwnContent(): by path", async (assert) => {
+        const content = await jsb.getOwnContent(`${project}/index`);
         assert.deepEqual(content, TestFileContent);
     });
 
-    test("getOwnDocumentMetaByPath():", async (assert) => {
-        const meta = await jsb.getOwnDocumentMetaByPath(`${project}/index`);
+    test("getOwnDocumentMeta(): by path", async (assert) => {
+        const meta = await jsb.getOwnDocumentMeta(`${project}/index`);
         assert.hasAllKeys(meta, MetaExpectedKeys);
     });
 
@@ -234,9 +247,7 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.isTrue(changed);
 
         if (!isCi) {
-            const newContentFromServer = await jsb.getOwnContentByPath(
-                `${project}/index`
-            );
+            const newContentFromServer = await jsb.getOwnContent(`${project}/index`);
 
             assert.deepEqual(newContent, newContentFromServer);
         }

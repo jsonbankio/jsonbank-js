@@ -143,6 +143,25 @@ class JsonBank {
     }
 
     /**
+     * Get Public Content by ID or Path as string
+     */
+    async getContentAsString(
+        idOrPath: string,
+        jsbQuery: JSBQuery | JSBQuery[] = [],
+        queries: Record<string, any> = {}
+    ): Promise<string> {
+        try {
+            const { data } = await this.#api.get("f/" + idOrPath, {
+                params: JsonBank.queryParam(jsbQuery, queries),
+                responseType: "text"
+            });
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
      * Get Public Content Meta by ID or Path
      * @param idOrPath
      */
@@ -159,29 +178,7 @@ class JsonBank {
     }
 
     /**
-     * Get Public content meta by path
-     * @param path
-     */
-    async getDocumentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
-        return this.getDocumentMeta(path);
-    }
-
-    /**
-     * Get Public content by path
-     * @param path
-     * @param jsbQuery
-     * @param queries
-     */
-    async getContentByPath<T = any>(
-        path: string,
-        jsbQuery: JSBQuery | JSBQuery[] = [],
-        queries: Record<string, any> = {}
-    ): Promise<T> {
-        return this.getContent<T>(path, jsbQuery, queries);
-    }
-
-    /**
-     * Get  a json file from GitHub
+     * Get a json file from GitHub
      * @param path
      * @param jsbQuery
      * @param queries
@@ -194,6 +191,29 @@ class JsonBank {
         try {
             const { data } = await this.#api.get("gh/" + path, {
                 params: JsonBank.queryParam(jsbQuery, queries)
+            });
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
+     * Get  a json file from GitHub as string
+     * @param path
+     * @param jsbQuery
+     * @param queries
+     * @protected
+     */
+    async getGithubContentAsString(
+        path: string,
+        jsbQuery: JSBQuery | JSBQuery[] = [],
+        queries: Record<string, any> = {}
+    ): Promise<string> {
+        try {
+            const { data } = await this.#api.get("gh/" + path, {
+                params: JsonBank.queryParam(jsbQuery, queries),
+                responseType: "text"
             });
             return data;
         } catch (err) {
@@ -242,6 +262,30 @@ class JsonBank {
     }
 
     /**
+     * Get own Content by ID or Path as string
+     * @param idOrPath
+     * @param jsbQuery
+     * @param queries
+     */
+    async getOwnContentAsString(
+        idOrPath: string,
+        jsbQuery: JSBQuery[] = [],
+        queries: Record<string, any> = {}
+    ): Promise<string> {
+        const config = this.memory.axiosPubKeyHeader({
+            params: JsonBank.queryParam(jsbQuery, queries),
+            responseType: "text"
+        });
+
+        try {
+            const { data } = await this.#v1.get("file/" + idOrPath, config);
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
      * Get own Content Meta by ID or Path
      * @param idOrPath
      */
@@ -254,28 +298,6 @@ class JsonBank {
         } catch (err) {
             throw this.___handleHttpError(err);
         }
-    }
-
-    /**
-     * Get own Content Meta by ID or Path
-     * @param path
-     */
-    async getOwnDocumentMetaByPath(path: string): Promise<JSB_Response.ContentMeta> {
-        return this.getOwnDocumentMeta(path);
-    }
-
-    /**
-     * Get own Content by ID or Path
-     * @param path
-     * @param jsbQuery
-     * @param queries
-     */
-    async getOwnContentByPath<T = any>(
-        path: string,
-        jsbQuery: JSBQuery[] = [],
-        queries: Record<string, any> = {}
-    ): Promise<T> {
-        return this.getOwnContent<T>(path, jsbQuery, queries);
     }
 
     /**
@@ -351,10 +373,10 @@ class JsonBank {
         try {
             return await this.createDocument(document);
         } catch (err: any) {
-            // If a document already exists
+            // If a document already exists,
             // find a document by meta and return it
             if (err.code && err.code === "name.exists") {
-                const doc = await this.getOwnDocumentMetaByPath(
+                const doc = await this.getOwnDocumentMeta(
                     jsb_makeDocumentPath(document)
                 );
 
