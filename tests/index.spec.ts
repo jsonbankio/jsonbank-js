@@ -15,6 +15,7 @@ const MetaExpectedKeys = [
     "project",
     "contentSize",
     "path",
+    "name",
     "createdAt",
     "updatedAt"
 ];

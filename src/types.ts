@@ -47,6 +47,8 @@ export declare namespace JSB_Response {
         project: string;
         contentSize: NumberAndString;
         path: string;
+        name: string;
+        folderId?: string;
         updatedAt: string;
         createdAt: string;
     };
