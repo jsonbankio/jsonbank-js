@@ -69,6 +69,7 @@ export declare namespace JSB_Response {
         name: string;
         path: string;
         project: string;
+        parentFolder?: string;
         createdAt: string;
         updatedAt: string;
         // stats field is optional and will exist only when requested
