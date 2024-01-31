@@ -14,6 +14,7 @@ const modifiers = [
     "take",
     "takeRight",
     "mapPick",
+    "mapOmit",
 
     // Obj
     "get",
