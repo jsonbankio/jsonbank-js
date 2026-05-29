@@ -6,3 +6,4 @@ tests/.env
 *.js
 !japaFile.js
 *.d.ts
+tests/.env
