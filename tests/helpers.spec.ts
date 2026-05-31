@@ -1,5 +1,5 @@
 import test from "japa";
-import { jsb_Query } from "../src/helpers";
+import { jsb_Query } from "../src/JsonBankQuery";
 
 test("jsb_Query()", (assert) => {
     const [query] = jsb_Query({
@@ -19,7 +19,7 @@ test("jsb_Query(): with array of  string Args", (assert) => {
     assert.deepEqual(query, "mapPick-name-phone");
 });
 
-test("jsb_Query(): with var Args", (assert) => {
+test("jsb_Query(): with va  r Args", (assert) => {
     const [query, additionalQueries] = jsb_Query({
         apply: "mapPick",
         args: { var: "keys" },
