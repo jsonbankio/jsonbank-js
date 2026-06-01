@@ -36,7 +36,7 @@ test("jsb_Query(): with json Args", (assert) => {
     });
 
     assert.equal(query, "mapPick-json(keys)");
-    assert.deepEqual(additionalQueries, { keys: ["name", "iso3"] });
+    assert.deepEqual(additionalQueries, { keys: JSON.stringify(["name", "iso3"]) });
 });
 
 

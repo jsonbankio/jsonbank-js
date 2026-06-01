@@ -45,9 +45,6 @@ export const modifiers = [
     "sum"
 ] as const;
 export type Modifier = (typeof modifiers)[number];
-
-export type JSBVar = { json: string };
-export type JSBVarJson = { var: string };
 export type JSBArgs = string | string[] | JQVariable;
 export type JSBQuery = {
     apply: Modifier;
@@ -55,8 +52,7 @@ export type JSBQuery = {
     query?: Record<string, any>;
 };
 
-type JQArg = string | number | JQVariable;
-type JQVar = "var" | "json" | "raw" | "b64";
+
 
 function stringifyIfNotString(data: any): string | any {
     if (typeof data !== "string") {
@@ -65,6 +61,9 @@ function stringifyIfNotString(data: any): string | any {
 
     return data;
 }
+export type JQArg = string | number | JQVariable;
+
+type JQVar = "var" | "json" | "raw" | "b64";
 class JQVariable {
     public key: string;
     constructor(public type: JQVar, public data: JQArg | object, key?: string) {
@@ -91,7 +90,7 @@ class JQVariable {
 }
 
 /**
- * Convert JSBQuery to string
+ * Parse JSBQuery to string and additional queries
  * @param queries - JSBQuery
  * @example
  * const [query, additionalQueries] = parse_jsb_query({
@@ -160,7 +159,7 @@ export function $b64(data: object, key?: string) {
  * Convert JSBQuery or a list of JSBQuery to a query string
  * @param queries
  */
-export function jsb_queries(queries: JSBQuery[]) {
+export function jsb_queries(...queries: JSBQuery[]) {
     let queryStr = "";
     let queryObj: Record<string, any> = {};
 
