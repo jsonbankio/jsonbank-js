@@ -1,5 +1,7 @@
-import { configure, run } from "@japa/runner";
+import { configure, processCLIArgs, run } from "@japa/runner";
 import { assert } from "@japa/assert";
+
+processCLIArgs(process.argv.slice(2));
 
 configure({
     plugins: [assert()],
