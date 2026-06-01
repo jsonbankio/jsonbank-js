@@ -1,4 +1,5 @@
-import test from "japa";
+import { test } from "@japa/runner";
+import type { Assert } from "@japa/assert";
 import env from "./env";
 import JsonBankNode from "../src/JsonBankNode";
 import os from "os";
@@ -30,7 +31,7 @@ const NewDocumentExpectedKeys = [
 ];
 
 test.group("JsonBank: Not Authenticated", (group) => {
-    group.timeout(env.JSB_TIMEOUT);
+    group.each.timeout(env.JSB_TIMEOUT);
 
     let jsb: JsonBankNode;
     const testDoc = {
@@ -38,7 +39,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         path: "jsonbank/sdk-test/index"
     };
 
-    group.before(async () => {
+    group.setup(async () => {
         jsb = new JsonBankNode({ host: env.JSB_HOST });
 
         // Find id of a test document
@@ -59,15 +60,15 @@ test.group("JsonBank: Not Authenticated", (group) => {
         }
     });
 
-    test.failing("authenticate(): Should not be able to authenticate", async () => {
+    test("authenticate(): Should not be able to authenticate", async () => {
         await jsb.authenticate();
-    });
+    }).fails();
 
-    test("isAuthenticated(): Should not be authenticated", async (assert) => {
+    test("isAuthenticated(): Should not be authenticated", async ({ assert }: { assert: Assert }) => {
         await assert.isFalse(jsb.isAuthenticated());
     });
 
-    test("getContent(): Get public content by Id", async (assert) => {
+    test("getContent(): Get public content by Id", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getContent(testDoc.id);
         // test with .json extension
         const content2 = await jsb.getContent(testDoc.id + ".json");
@@ -77,7 +78,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(content, content2);
     });
 
-    test("getContentAsString(): Get public content by Id", async (assert) => {
+    test("getContentAsString(): Get public content by Id", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getContentAsString(testDoc.id);
         // test with .json extension
         const content2 = await jsb.getContentAsString(testDoc.id + ".json");
@@ -87,7 +88,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(content, content2);
     });
 
-    test("getContent(): Get public content by id with {jsbQuery}", async (assert) => {
+    test("getContent(): Get public content by id with {jsbQuery}", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getContent(testDoc.id, {
             apply: "pick",
             args: ["name"] /// only pick name
@@ -98,17 +99,17 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
     });
 
-    test("getDocumentMeta(): Get public content meta by ID", async (assert) => {
+    test("getDocumentMeta(): Get public content meta by ID", async ({ assert }: { assert: Assert }) => {
         const meta = await jsb.getDocumentMeta(testDoc.id);
         // test with .json extension
         const meta2 = await jsb.getDocumentMeta(testDoc.id + ".json");
 
-        assert.hasAllKeys(meta, MetaExpectedKeys);
+        assert.onlyProperties(meta, MetaExpectedKeys);
 
         assert.deepEqual(meta, meta2);
     });
 
-    test("getContent(): Get public content by path", async (assert) => {
+    test("getContent(): Get public content by path", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getContent("jsonbank/sdk-test/index");
         // test with .json extension
         const content2 = await jsb.getContent("jsonbank/sdk-test/index.json");
@@ -118,7 +119,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.deepEqual(content, content2);
     });
 
-    test("getContent(): Get public content by path with {jsbQuery}", async (assert) => {
+    test("getContent(): Get public content by path with {jsbQuery}", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getContent("jsonbank/sdk-test/index", {
             apply: "pick",
             args: ["name"] /// only pick name
@@ -129,17 +130,17 @@ test.group("JsonBank: Not Authenticated", (group) => {
         });
     });
 
-    test("getDocumentMeta(): Get public content meta by path", async (assert) => {
+    test("getDocumentMeta(): Get public content meta by path", async ({ assert }: { assert: Assert }) => {
         const meta = await jsb.getDocumentMeta("jsonbank/sdk-test/index");
         // test with .json extension
         const meta2 = await jsb.getDocumentMeta("jsonbank/sdk-test/index.json");
 
-        assert.hasAllKeys(meta, MetaExpectedKeys);
+        assert.onlyProperties(meta, MetaExpectedKeys);
 
         assert.deepEqual(meta, meta2);
     });
 
-    test("getGithubContent(): Get content from github", async (assert) => {
+    test("getGithubContent(): Get content from github", async ({ assert }: { assert: Assert }) => {
         const pkg = await jsb.getGithubContent(
             "jsonbankio/jsonbank-js/package.json"
         );
@@ -149,7 +150,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         assert.equal(pkg.author, "jsonbankio");
     });
 
-    test("getGithubContent(): Get content from github with jsbQuery", async (assert) => {
+    test("getGithubContent(): Get content from github with jsbQuery", async ({ assert }: { assert: Assert }) => {
         const pkg = await jsb.getGithubContent(
             "jsonbankio/jsonbank-js/package.json",
             { apply: "pick", args: ["name", "author"] }
@@ -164,7 +165,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
 });
 
 test.group("JsonBank: Authenticated", (group) => {
-    group.timeout(env.JSB_TIMEOUT);
+    group.each.timeout(env.JSB_TIMEOUT);
 
     let jsb: JsonBankNode;
     const project = "sdk-test";
@@ -173,7 +174,7 @@ test.group("JsonBank: Authenticated", (group) => {
         path: `${project}/index`
     };
 
-    group.before(async () => {
+    group.setup(async () => {
         jsb = new JsonBankNode({
             host: env.JSB_HOST,
             keys: {
@@ -194,47 +195,47 @@ test.group("JsonBank: Authenticated", (group) => {
         testDoc.id = document.id;
     });
 
-    test("isAuthenticated()", async (assert) => {
+    test("isAuthenticated()", async ({ assert }: { assert: Assert }) => {
         assert.isTrue(jsb.isAuthenticated());
     });
 
-    test("getUsername():", async (assert) => {
+    test("getUsername():", async ({ assert }: { assert: Assert }) => {
         assert.equal(await jsb.getUsername(), "jsonbank");
     });
 
-    test("getOwnContent():", async (assert) => {
+    test("getOwnContent():", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getOwnContent(testDoc.id);
 
         assert.deepEqual(content, TestFileContent);
     });
 
-    test("getOwnContentAsString(): by path", async (assert) => {
+    test("getOwnContentAsString(): by path", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getOwnContentAsString(`${project}/index`);
         assert.deepEqual(content, JSON.stringify(TestFileContent));
     });
 
-    test("getOwnDocumentMeta():", async (assert) => {
+    test("getOwnDocumentMeta():", async ({ assert }: { assert: Assert }) => {
         const meta = await jsb.getOwnDocumentMeta(testDoc.id);
-        assert.hasAllKeys(meta, MetaExpectedKeys);
+        assert.onlyProperties(meta, MetaExpectedKeys);
     });
 
-    test("getOwnContent(): by path", async (assert) => {
+    test("getOwnContent(): by path", async ({ assert }: { assert: Assert }) => {
         const content = await jsb.getOwnContent(`${project}/index`);
         assert.deepEqual(content, TestFileContent);
     });
 
-    test("getOwnDocumentMeta(): by path", async (assert) => {
+    test("getOwnDocumentMeta(): by path", async ({ assert }: { assert: Assert }) => {
         const meta = await jsb.getOwnDocumentMeta(`${project}/index`);
-        assert.hasAllKeys(meta, MetaExpectedKeys);
+        assert.onlyProperties(meta, MetaExpectedKeys);
     });
 
-    test("hasOwnDocument()", async (assert) => {
+    test("hasOwnDocument()", async ({ assert }: { assert: Assert }) => {
         assert.isTrue(await jsb.hasOwnDocument(testDoc.id));
         // fail
         assert.isFalse(await jsb.hasOwnDocument("not-existing-id"));
     });
 
-    test("updateContent():", async (assert) => {
+    test("updateContent():", async ({ assert }: { assert: Assert }) => {
         const newContent = {
             ...TestFileContent,
             updatedAt: new Date().toISOString()
@@ -257,7 +258,7 @@ test.group("JsonBank: Authenticated", (group) => {
         await jsb.updateOwnDocument(`${project}/index`, TestFileContent);
     });
 
-    test("createFolder():", async (assert) => {
+    test("createFolder():", async ({ assert }: { assert: Assert }) => {
         try {
             const folder = await jsb.createFolder({
                 name: "folder",
@@ -265,7 +266,7 @@ test.group("JsonBank: Authenticated", (group) => {
             });
 
             assert.isObject(folder);
-            assert.hasAllKeys(folder, ["id", "name", "path", "project"]);
+            assert.onlyProperties(folder, ["id", "name", "path", "project"]);
 
             // check folder name matches
             assert.equal(folder.name, "folder");
@@ -276,7 +277,7 @@ test.group("JsonBank: Authenticated", (group) => {
         }
     });
 
-    test("createDocument():", async (assert) => {
+    test("createDocument():", async ({ assert }: { assert: Assert }) => {
         await jsb.deleteDocument(`${project}/folder/new_doc`);
 
         const doc = await jsb.createDocument({
@@ -290,14 +291,14 @@ test.group("JsonBank: Authenticated", (group) => {
         });
 
         assert.isObject(doc);
-        assert.hasAllKeys(doc, NewDocumentExpectedKeys);
+        assert.onlyProperties(doc, NewDocumentExpectedKeys);
         // test project name
         assert.equal(doc.project, project);
 
         await jsb.deleteDocument(`${project}/folder/new_doc`);
     });
 
-    test("uploadDocument():", async (assert) => {
+    test("uploadDocument():", async ({ assert }: { assert: Assert }) => {
         // delete file if exists
         await jsb.deleteDocument(`${project}/folder/upload`);
 
@@ -309,16 +310,16 @@ test.group("JsonBank: Authenticated", (group) => {
         });
 
         assert.isObject(doc);
-        assert.hasAllKeys(doc, NewDocumentExpectedKeys);
+        assert.onlyProperties(doc, NewDocumentExpectedKeys);
         // test project name
         assert.equal(doc.project, project);
     });
 
-    test("getFolder", async (assert) => {
+    test("getFolder", async ({ assert }: { assert: Assert }) => {
         const folder = await jsb.getFolder(`${project}/folder`);
 
         assert.isObject(folder);
-        assert.hasAllKeys(folder, [
+        assert.onlyProperties(folder, [
             "id",
             "name",
             "path",
@@ -336,11 +337,11 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.deepEqual(folder, folder2);
     });
 
-    test("getFolder with stats", async (assert) => {
+    test("getFolder with stats", async ({ assert }: { assert: Assert }) => {
         const folder = await jsb.getFolderWithStats(`${project}/folder`);
 
         assert.isObject(folder);
-        assert.hasAllKeys(folder, [
+        assert.onlyProperties(folder, [
             "id",
             "name",
             "path",
@@ -359,14 +360,14 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.deepEqual(folder, folder2);
     });
 
-    test("createFolderIfNotExists", async (assert) => {
+    test("createFolderIfNotExists", async ({ assert }: { assert: Assert }) => {
         const folder = await jsb.createFolderIfNotExists({
             name: "folder",
             project
         });
 
         assert.isObject(folder);
-        assert.hasAllKeys(folder, [
+        assert.onlyProperties(folder, [
             "id",
             "name",
             "path",
