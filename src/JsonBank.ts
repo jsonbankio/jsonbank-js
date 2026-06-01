@@ -2,11 +2,11 @@ import axios, { AxiosInstance } from "axios";
 import {
     jsb_makeDocumentPath,
     jsb_makeFolderPath,
-    jsb_Query,
-    JSBQuery
+
 } from "./helpers";
 import Memory from "./memory";
 import { JSB_Body, JSB_Response, JsonBankConfig } from "./types";
+import { parse_jsb_query, JSBQuery } from "./JsonBankQuery";
 
 export class JSB_Error extends Error {
     code?: string;
@@ -227,7 +227,7 @@ class JsonBank {
     ) {
         if (!query) return {};
 
-        const [q, additionalQueries] = jsb_Query(query);
+        const [q, additionalQueries] = parse_jsb_query(query);
 
         if (!q) return {};
 
