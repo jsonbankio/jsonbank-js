@@ -1,2 +1,11 @@
 import JsonBank from "./src/JsonBank";
-export { JsonBank };
+import { $b64, $json, $raw, $var, jsb_query_filters } from "./src/JsonBankQuery";
+
+export {
+    JsonBank,
+    $b64,
+    $json,
+    $raw,
+    $var,
+    jsb_query_filters,
+};
