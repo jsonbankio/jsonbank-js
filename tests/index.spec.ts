@@ -72,9 +72,7 @@ test.group("JsonBank: Not Authenticated", (group) => {
         const content = await jsb.getContent(testDoc.id);
         // test with .json extension
         const content2 = await jsb.getContent(testDoc.id + ".json");
-
         assert.deepEqual(content, TestFileContent);
-
         assert.deepEqual(content, content2);
     });
 
