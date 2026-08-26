@@ -358,6 +358,135 @@ test.group("JsonBank: Authenticated", (group) => {
         assert.deepEqual(folder, folder2);
     });
 
+    test("scanProject(): list project root", async ({ assert }: { assert: Assert }) => {
+        const list = await jsb.scanProject(project);
+
+        // no folder was requested, so the project root was listed
+        assert.onlyProperties(list, ["project", "documents", "folders"]);
+        assert.equal(list.project.slug, project);
+        assert.oneOf(list.project.access, ["public", "private"]);
+
+        for (const paginated of [list.documents, list.folders]) {
+            assert.isArray(paginated.data);
+            assert.onlyProperties(paginated.meta, [
+                "page",
+                "perPage",
+                "total",
+                "lastPage"
+            ]);
+        }
+
+        // index.json lives at the root
+        assert.isTrue(list.documents.data.some((doc) => doc.name === "index"));
+        for (const doc of list.documents.data) {
+            assert.properties(doc, MetaExpectedKeys);
+        }
+
+        // the "folder" folder lives at the root
+        assert.isTrue(list.folders.data.some((folder) => folder.name === "folder"));
+    });
+
+    test("scanProject(): list a folder by path and by id", async ({ assert }: { assert: Assert }) => {
+        const list = await jsb.scanProject(project, { folder: "folder" });
+
+        // a folder was requested, so it is echoed back
+        assert.onlyProperties(list, ["project", "folder", "documents", "folders"]);
+        assert.isObject(list.folder);
+        assert.equal(list.folder!.path, "folder");
+
+        // every document in a folder is tagged with its folder id
+        for (const doc of list.documents.data) {
+            assert.equal(doc.folderId, list.folder!.id);
+        }
+
+        // listing by id must match listing by path
+        const listById = await jsb.scanProject(project, { folder: list.folder!.id });
+        assert.deepEqual(list, listById);
+    });
+
+    test("listDocuments():", async ({ assert }: { assert: Assert }) => {
+        const list = await jsb.listDocuments(project);
+
+        // folders are not queried by this endpoint
+        assert.onlyProperties(list, ["project", "documents"]);
+        assert.equal(list.project.slug, project);
+
+        for (const doc of list.documents.data) {
+            assert.properties(doc, MetaExpectedKeys);
+        }
+
+        // documents must match the ones scanProject() returns
+        const scan = await jsb.scanProject(project);
+        assert.deepEqual(list.documents, scan.documents);
+    });
+
+    test("listFolders():", async ({ assert }: { assert: Assert }) => {
+        const list = await jsb.listFolders(project);
+
+        // documents are not queried by this endpoint
+        assert.onlyProperties(list, ["project", "folders"]);
+        assert.equal(list.project.slug, project);
+
+        for (const folder of list.folders.data) {
+            assert.properties(folder, [
+                "id",
+                "name",
+                "path",
+                "project",
+                "createdAt",
+                "updatedAt"
+            ]);
+        }
+
+        // folders must match the ones scanProject() returns
+        const scan = await jsb.scanProject(project);
+        assert.deepEqual(list.folders, scan.folders);
+    });
+
+    test("listDocuments(): paginate", async ({ assert }: { assert: Assert }) => {
+        const { documents } = await jsb.listDocuments(project, { perPage: 1 });
+
+        assert.equal(documents.meta.page, 1);
+        assert.equal(documents.meta.perPage, 1);
+        assert.isAtMost(documents.data.length, 1);
+        assert.equal(documents.meta.lastPage, documents.meta.total);
+    });
+
+    test("listDocuments(): sort", async ({ assert }: { assert: Assert }) => {
+        const asc = await jsb.listDocuments(project, {
+            sort: "createdAt",
+            order: "asc"
+        });
+
+        const desc = await jsb.listDocuments(project, {
+            sort: "createdAt",
+            order: "desc"
+        });
+
+        assert.deepEqual(
+            asc.documents.data.map((doc) => doc.id),
+            desc.documents.data.map((doc) => doc.id).reverse()
+        );
+    });
+
+    test("listDocuments(): rejects an unknown sort field", async ({ assert }: { assert: Assert }) => {
+        try {
+            await jsb.listDocuments(project, { sort: "nope" as any });
+            assert.fail("Expected an unknown sort field to be rejected");
+        } catch (e) {
+            assert.equal((e as JSB_Error).code, "sort.invalid");
+        }
+    });
+
+    test("scanProject(): rejects an unknown project", async ({ assert }: { assert: Assert }) => {
+        try {
+            await jsb.scanProject("not-a-real-project");
+            assert.fail("Expected an unknown project to be rejected");
+        } catch (e) {
+            assert.equal((e as JSB_Error).name, "JSB_Error");
+        }
+    });
+
     test("createFolderIfNotExists", async ({ assert }: { assert: Assert }) => {
         const folder = await jsb.createFolderIfNotExists({
             name: "folder",
