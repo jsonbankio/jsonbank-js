@@ -5,7 +5,7 @@ import {
 
 } from "./helpers";
 import Memory from "./memory";
-import { JSB_Body, JSB_Response, JsonBankConfig } from "./types";
+import { JSB_Body, JSB_Params, JSB_Response, JsonBankConfig } from "./types";
 import { parse_jsb_query, JSBQuery } from "./JsonBankQuery";
 
 export class JSB_Error extends Error {
@@ -434,6 +434,75 @@ class JsonBank {
      */
     async getFolderWithStats(idOrPath: string) {
         return this.getFolder(idOrPath, true);
+    }
+
+    /**
+     * List documents and folders in a project, one level deep.
+     * Pass `params.folder` (id or path) to scan inside a folder,
+     * leave it out to scan the project root.
+     * @note Both lists paginate independently of each other.
+     * @param project
+     * @param params
+     */
+    async scanProject(
+        project: string,
+        params: JSB_Params.ScanProject = {}
+    ): Promise<JSB_Response.ScanProject> {
+        try {
+            const { data } = await this.#v1.get<JSB_Response.ScanProject>(
+                "list/" + project,
+                this.memory.axiosPubKeyHeader({ params })
+            );
+
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
+     * List documents in a project, one level deep.
+     * Same as scanProject() without the folders.
+     * @note Content is not included, fetch it with getOwnContent()
+     * @param project
+     * @param params
+     */
+    async listDocuments(
+        project: string,
+        params: JSB_Params.ListItems = {}
+    ): Promise<JSB_Response.ListDocuments> {
+        try {
+            const { data } = await this.#v1.get<JSB_Response.ListDocuments>(
+                `list/${project}/documents`,
+                this.memory.axiosPubKeyHeader({ params })
+            );
+
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
+    }
+
+    /**
+     * List folders in a project, one level deep.
+     * Same as scanProject() without the documents.
+     * @param project
+     * @param params
+     */
+    async listFolders(
+        project: string,
+        params: JSB_Params.ListItems = {}
+    ): Promise<JSB_Response.ListFolders> {
+        try {
+            const { data } = await this.#v1.get<JSB_Response.ListFolders>(
+                `list/${project}/folders`,
+                this.memory.axiosPubKeyHeader({ params })
+            );
+
+            return data;
+        } catch (err) {
+            throw this.___handleHttpError(err);
+        }
     }
 
     /**
